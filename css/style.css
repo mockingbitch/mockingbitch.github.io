@@ -12,10 +12,78 @@ header{
     margin-top: 100px;
     text-align: center;
 }
-body{
-    background-image: url('https://wallpapercave.com/wp/wp1874701.jpg');
-    background-size: auto;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-size: cover;
+
+
+body, html {
+  height: 100%;
+  margin: 0;
+  font: 400 15px/1.8 "Lato", sans-serif;
+  color: #777;
 }
+
+.bgimg-1, .bgimg-2, .bgimg-3 {
+  position: relative;
+  opacity: 0.65;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+
+}
+.bgimg-1 {
+  background-image: url("https://wallpapercave.com/wp/wp1874701.jpg");
+  min-height: 100%;
+}
+
+.bgimg-2 {
+  background-image: url("https://static.billboard.com/files/media/Melanie-Martinez-cr-Guerin-Blask-billboard-1548-compressed.jpg");
+  min-height: 400px;
+}
+
+.bgimg-3 {
+  background-image: url("../images/46508500_597573834005211_4803065294371160064_o.jpg");
+  min-height: 400px;
+}
+
+.caption {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  text-align: center;
+  color: #000;
+}
+
+.caption span.border {
+    border-radius: 10px;
+    background-color: #111;
+    color: #fff;
+    padding: 18px;
+    font-size: 25px;
+    letter-spacing: 10px;
+}
+
+
+h3 {
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  font: 20px "Lato", sans-serif;
+  color: #111;
+}
+
+/* Turn off parallax scrolling for tablets and phones */
+@media only screen and (max-device-width: 1024px) {
+  .bgimg-1, .bgimg-2, .bgimg-3 {
+    background-attachment: scroll;
+  }
+}
+button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+  }
