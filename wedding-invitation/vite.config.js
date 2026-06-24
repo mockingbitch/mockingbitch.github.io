@@ -18,12 +18,19 @@ function wishesApiPlugin() {
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // Published as a sub-path of the GitHub Pages user site:
+  // https://mockingbitch.github.io/wedding/
+  base: '/wedding/',
   plugins: [react(), wishesApiPlugin()],
   server: {
     host: true,
     port: 5173,
   },
   build: {
+    // Emit the static site into the repo-root /wedding folder so GitHub Pages
+    // (which deploys the whole branch) serves it at /wedding/.
+    outDir: '../wedding',
+    emptyOutDir: true,
     target: 'es2018',
     cssCodeSplit: true,
     rollupOptions: {
