@@ -21,8 +21,7 @@ export default function Gallery({ no, total }) {
         <motion.div
           variants={stagger(0.06, 0.05)}
           initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
+          animate="show"
         >
           <motion.div variants={fadeUp} className="mb-6 flex items-center justify-between">
             <ChapterTag no={no} total={total} label="Khoảnh Khắc" />

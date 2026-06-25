@@ -13,7 +13,7 @@ export default {
         },
         paper: '#F2EEE6',
         muted: '#B7B0A2',
-        faint: '#867E70',
+        faint: '#969084',
         bronze: {
           DEFAULT: '#C2A06A',
           deep: '#9C7E4E',
@@ -26,6 +26,7 @@ export default {
       },
       fontFamily: {
         display: ['"Fraunces"', 'Georgia', 'serif'],
+        serif: ['"Fraunces"', 'Georgia', 'serif'], // alias for the reused Lightbox
         sans: ['"Archivo"', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },

@@ -7,12 +7,14 @@ import Panel, { ChapterTag } from '../ui/Panel'
 export default function Gifts({ no, total }) {
   return (
     <Panel bg="bg-ink" contentClassName="items-center justify-center">
-      <div className="w-full max-w-3xl text-center">
+      <div
+        data-vscroll
+        className="no-scrollbar max-h-full w-full max-w-3xl overflow-y-auto py-2 text-center"
+      >
         <motion.div
           variants={stagger(0.1, 0.05)}
           initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.25 }}
+          animate="show"
         >
           <motion.div variants={fadeUp} className="flex justify-center">
             <ChapterTag no={no} total={total} label="Mừng Cưới" />

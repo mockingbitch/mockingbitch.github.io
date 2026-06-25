@@ -9,13 +9,12 @@ export default function Cover({ no, total }) {
       image={hero.image}
       imageAlt={hero.imageAlt}
       overlay="bg-gradient-to-tr from-ink via-ink/75 to-ink/25"
-      contentClassName="items-end justify-start"
+      contentClassName="items-end justify-start pb-28 sm:pb-24"
     >
       <motion.div
         variants={stagger(0.12, 0.15)}
         initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.4 }}
+        animate="show"
         className="max-w-panel"
       >
         <motion.div variants={fadeUp}>

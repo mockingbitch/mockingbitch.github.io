@@ -7,17 +7,26 @@ import { AnimatePresence, motion } from 'framer-motion'
 // - ← / → keys, on-screen arrows and chapter dots navigate
 export default function Deck({ children, labels = [] }) {
   const trackRef = useRef(null)
-  const [active, setActive] = useState(0)
   const count = Children.count(children)
+  // Seed from the URL hash so the masthead/label are correct immediately.
+  const [active, setActive] = useState(() => {
+    const n = parseInt((window.location.hash || '').slice(1), 10)
+    return n >= 1 && n <= count ? n - 1 : 0
+  })
 
-  // Translate vertical wheel into horizontal movement (unless the cursor is
-  // over an element that scrolls vertically on its own).
+  // Translate vertical wheel into horizontal movement, but let an inner
+  // vertical scroller ([data-vscroll]) consume the wheel until it reaches its
+  // edge in the scroll direction — then resume advancing the deck.
   useEffect(() => {
     const el = trackRef.current
     if (!el) return
     const onWheel = (e) => {
       const vs = e.target.closest && e.target.closest('[data-vscroll]')
-      if (vs && vs.scrollHeight > vs.clientHeight + 4) return
+      if (vs && vs.scrollHeight > vs.clientHeight + 4) {
+        const atTop = vs.scrollTop <= 0
+        const atBottom = vs.scrollTop + vs.clientHeight >= vs.scrollHeight - 1
+        if ((e.deltaY < 0 && !atTop) || (e.deltaY > 0 && !atBottom)) return
+      }
       if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
         el.scrollLeft += e.deltaY
         e.preventDefault()
@@ -26,6 +35,18 @@ export default function Deck({ children, labels = [] }) {
     el.addEventListener('wheel', onWheel, { passive: false })
     return () => el.removeEventListener('wheel', onWheel)
   }, [])
+
+  // Re-pin to the active chapter when the viewport size / orientation changes
+  // (scroll-snap doesn't reliably re-align an already-settled position).
+  useEffect(() => {
+    const el = trackRef.current
+    if (!el) return
+    const onResize = () => {
+      el.scrollLeft = active * el.clientWidth
+    }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [active])
 
   // Track the active panel from scroll position.
   useEffect(() => {
@@ -69,6 +90,16 @@ export default function Deck({ children, labels = [] }) {
     }
   }, [count])
 
+  // Respond to live hash changes (e.g. shared deep-links, back/forward).
+  useEffect(() => {
+    const onHash = () => {
+      const n = parseInt((window.location.hash || '').slice(1), 10)
+      if (n >= 1 && n <= count) goTo(n - 1)
+    }
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [count, goTo])
+
   useEffect(() => {
     const onKey = (e) => {
       // Let the lightbox own the keyboard while it is open.
@@ -101,7 +132,7 @@ export default function Deck({ children, labels = [] }) {
       </div>
 
       {/* Fixed masthead */}
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-center justify-between px-7 py-6 sm:px-16">
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-center justify-between px-7 pb-6 pt-[max(1.5rem,env(safe-area-inset-top))] sm:px-16">
         <span className="font-display text-lg italic text-paper/90">
           TD <span className="text-bronze">&amp;</span> QP
         </span>
@@ -128,7 +159,7 @@ export default function Deck({ children, labels = [] }) {
       </div>
 
       {/* Dots + arrows (bottom-right) */}
-      <div className="fixed bottom-6 right-7 z-50 flex items-center gap-4 sm:right-16">
+      <div className="fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-7 z-50 flex items-center gap-4 sm:right-16">
         <div className="hidden items-center gap-2 sm:flex">
           {Array.from({ length: count }).map((_, i) => (
             <button
@@ -141,12 +172,12 @@ export default function Deck({ children, labels = [] }) {
             />
           ))}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => goTo(active - 1)}
             disabled={atStart}
             aria-label="Chương trước"
-            className="grid h-10 w-10 place-items-center rounded-full border border-line text-paper/80 transition-colors hover:border-bronze/60 hover:text-bronze disabled:opacity-30"
+            className="grid h-11 w-11 place-items-center rounded-full border border-line text-paper/80 transition-colors hover:border-bronze/60 hover:text-bronze disabled:opacity-30"
           >
             ←
           </button>
@@ -154,7 +185,7 @@ export default function Deck({ children, labels = [] }) {
             onClick={() => goTo(active + 1)}
             disabled={atEnd}
             aria-label="Chương sau"
-            className="grid h-10 w-10 place-items-center rounded-full border border-line text-paper/80 transition-colors hover:border-bronze/60 hover:text-bronze disabled:opacity-30"
+            className="grid h-11 w-11 place-items-center rounded-full border border-line text-paper/80 transition-colors hover:border-bronze/60 hover:text-bronze disabled:opacity-30"
           >
             →
           </button>

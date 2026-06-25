@@ -10,13 +10,12 @@ export default function Story({ no, total, milestone }) {
       image={m.image}
       imageAlt={m.title}
       overlay="bg-gradient-to-t from-ink via-ink/70 to-ink/20"
-      contentClassName="items-end justify-start"
+      contentClassName="items-end justify-start pb-28 sm:pb-24"
     >
       <motion.div
         variants={stagger(0.12, 0.1)}
         initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.4 }}
+        animate="show"
         className="max-w-panel"
       >
         <motion.div variants={fadeUp}>

@@ -13,8 +13,7 @@ export default function Venues({ no, total }) {
         <motion.div
           variants={stagger(0.1, 0.05)}
           initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
+          animate="show"
         >
           <motion.div variants={fadeUp} className="flex justify-center">
             <ChapterTag no={no} total={total} label="Địa Điểm" />

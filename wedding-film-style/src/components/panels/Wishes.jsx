@@ -40,13 +40,15 @@ export default function Wishes({ no, total }) {
 
   return (
     <Panel bg="bg-ink-800" contentClassName="items-center justify-center">
-      <div className="grid w-full max-w-5xl gap-10 lg:grid-cols-2 lg:gap-16">
+      <div
+        data-vscroll
+        className="no-scrollbar grid max-h-full w-full max-w-5xl gap-10 overflow-y-auto py-2 lg:grid-cols-2 lg:gap-16"
+      >
         {/* form */}
         <motion.div
           variants={stagger(0.1, 0.05)}
           initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
+          animate="show"
         >
           <motion.div variants={fadeUp}>
             <ChapterTag no={no} total={total} label="Sổ Lưu Bút" />
@@ -82,7 +84,7 @@ export default function Wishes({ no, total }) {
         {/* recent wishes */}
         <div
           data-vscroll
-          className="no-scrollbar max-h-[60vh] space-y-4 overflow-y-auto lg:max-h-[70vh]"
+          className="no-scrollbar space-y-4 lg:max-h-[68vh] lg:overflow-y-auto lg:pr-2"
         >
           {list.length === 0 ? (
             <p className="font-display text-lg italic text-faint">{copy.emptyState}</p>

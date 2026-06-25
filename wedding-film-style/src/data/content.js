@@ -125,7 +125,7 @@ export const details = {
   dress: {
     label: 'Trang Phục',
     title: 'Sang trọng & rạng rỡ',
-    text: 'Tông màu đề xuất: đỏ đô, champagne, vàng đồng và ngà — hoà cùng sắc đỏ của hôn lễ. Áo dài luôn được chào đón.',
+    text: 'Tông màu đề xuất: trung tính & trầm ấm — be, nâu đồng, champagne và ngà. Áo dài luôn được chào đón.',
   },
 }
 
@@ -207,12 +207,3 @@ export const footer = {
   date: '02 & 08 · 08 · 2026',
   credit: 'Thực hiện với tình yêu',
 }
-
-export const nav = [
-  { id: 'hero', label: 'Thiệp Mời' },
-  { id: 'story', label: 'Chuyện Tình' },
-  { id: 'info', label: 'Lịch & Địa Điểm' },
-  { id: 'schedule', label: 'Chương Trình' },
-  { id: 'gallery', label: 'Album' },
-  { id: 'wishes', label: 'Lời Chúc' },
-]

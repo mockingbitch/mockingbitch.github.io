@@ -9,8 +9,7 @@ export default function Invite({ no, total }) {
       <motion.div
         variants={stagger(0.14, 0.1)}
         initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.4 }}
+        animate="show"
         className="mx-auto max-w-2xl"
       >
         <motion.div variants={fadeUp} className="flex justify-center">
