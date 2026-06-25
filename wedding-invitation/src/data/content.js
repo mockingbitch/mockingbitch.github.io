@@ -11,8 +11,8 @@ const img = (id, w = 1600) =>
 export const couple = {
   bride: 'Thùy Dung',
   groom: 'Quang Phong',
-  brideFull: 'Trần Thùy Dung',
-  groomFull: 'Nguyễn Quang Phong',
+  brideFull: 'Nguyễn Thùy Dung',
+  groomFull: 'Trần Quang Phong',
   hashtag: '#ThuyDungQuangPhong',
   // Ngày dùng cho đồng hồ đếm ngược + màn mở đầu (lấy buổi tiệc diễn ra trước).
   date: '2026-08-02T11:00:00',
@@ -35,34 +35,34 @@ export const loveStory = {
   eyebrow: 'Hành Trình Của Chúng Mình',
   title: 'Một tình yêu nở hoa',
   intro:
-    'Mọi câu chuyện đẹp đều có khởi đầu của riêng nó. Chuyện của chúng mình bắt đầu từ một ly cà phê đổ và một chiếc dù mượn tạm — và cứ thế, những điều tình cờ ngọt ngào nối nhau từ ngày ấy.',
+    'Mọi câu chuyện đẹp đều có một khởi đầu. Chuyện của chúng mình bắt đầu vào một ngày tháng Tám năm 2025 — và từ khoảnh khắc ấy, những điều bình dị bỗng hóa thân thương.',
   milestones: [
     {
-      year: '2018',
-      month: 'Tháng Mười',
+      year: '2025',
+      month: 'Tháng Tám',
       title: 'Lần đầu gặp gỡ',
-      text: 'Một quán cà phê nhỏ đông đúc giữa phố cổ. Một chiếc dù, hai người xa lạ, và cơn mưa mãi chẳng chịu ngừng. Và chúng mình đã trò chuyện cùng nhau từ dạo đó.',
+      text: 'Giữa bộn bề ngày thường, chúng mình tình cờ gặp nhau. Một ánh nhìn, một nụ cười — và câu chuyện của hai đứa bắt đầu từ đó.',
       image: img('1529636798458-92182e662485', 1200),
     },
     {
-      year: '2020',
-      month: 'Tháng Sáu',
-      title: 'Mái nhà đầu tiên',
-      text: 'Một căn hộ nhỏ với khung cửa sổ đón nắng mai. Chúng mình lấp đầy nó bằng cây xanh, những chiếc ly không cùng bộ, và thật nhiều sách.',
+      year: '2025',
+      month: 'Tháng Mười Một',
+      title: 'Chính thức bên nhau',
+      text: 'Sau những buổi chuyện trò không dứt và đôi lần hẹn hò ngại ngùng, chúng mình quyết định nắm tay nhau, cùng viết tiếp chặng đường phía trước.',
       image: img('1511285560929-80b456fea0bc', 1200),
     },
     {
-      year: '2023',
-      month: 'Tháng Mười Hai',
-      title: 'Chuyến đi lên núi',
-      text: 'Tuyết phủ trên hàng thông, một bình ca cao nóng, và niềm tin lặng lẽ rằng: dù ở nơi đâu có người kia — nơi ấy chính là nhà.',
+      year: '2026',
+      month: 'Tháng Ba',
+      title: 'Ra mắt hai gia đình',
+      text: 'Chúng mình đưa nhau về thưa chuyện với bố mẹ. Niềm vui được nhân đôi khi cả hai gia đình đều dành cho nhau những lời chúc phúc ấm áp.',
       image: img('1469371670807-013ccf25f16a', 1200),
     },
     {
-      year: '2025',
-      month: 'Tháng Chín',
+      year: '2026',
+      month: 'Tháng Sáu',
       title: 'Lời cầu hôn',
-      text: 'Dưới bầu trời đầy sao, trên vách núi nơi chúng mình ngắm bình minh đầu tiên cùng nhau, một câu hỏi được cất lên — và được đáp lại bằng những giọt nước mắt hạnh phúc.',
+      text: 'Dưới khoảnh khắc chỉ thuộc về hai đứa, một câu hỏi được cất lên — và lời đáp "em đồng ý" đã mở ra một khởi đầu mới.',
       image: img('1522673607200-164d1b6ce486', 1200),
     },
   ],
@@ -169,7 +169,7 @@ export const gifts = {
   qrs: [
     {
       side: 'Nhà Trai',
-      name: 'Nguyễn Quang Phong',
+      name: 'Trần Quang Phong',
       bank: 'Vietcombank',
       account: '0123 456 789',
       value: 'Mung cuoi Quang Phong | Vietcombank 0123456789',
@@ -177,7 +177,7 @@ export const gifts = {
     },
     {
       side: 'Nhà Gái',
-      name: 'Trần Thùy Dung',
+      name: 'Nguyễn Thùy Dung',
       bank: 'Techcombank',
       account: '9876 543 210',
       value: 'Mung cuoi Thuy Dung | Techcombank 9876543210',

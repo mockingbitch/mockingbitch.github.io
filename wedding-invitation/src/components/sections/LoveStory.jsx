@@ -95,7 +95,7 @@ export default function LoveStory() {
 
         <div className="space-y-16 md:space-y-24">
           {loveStory.milestones.map((m, i) => (
-            <Milestone key={m.year} data={m} index={i} />
+            <Milestone key={`${m.year}-${m.month}`} data={m} index={i} />
           ))}
         </div>
       </div>
