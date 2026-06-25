@@ -82,11 +82,11 @@ export const events = [
     date: '2026-08-02T11:00:00',
     dateShort: '02 · 08 · 2026',
     time: '11:00',
-    venue: 'Trung Tâm Tiệc Cưới Hoàng Gia',
-    address: ['Số 181 Nguyễn Huy Tưởng', 'Quận Thanh Xuân', 'Hà Nội'],
+    venue: 'Tràng An Palace',
+    address: ['Hei Tower, Phố Ngụy Như Kon Tum', 'Quận Thanh Xuân', 'Hà Nội'],
     mapLabel: 'Mở bản đồ',
     mapHref:
-      'https://www.google.com/maps/search/?api=1&query=Trung%20t%C3%A2m%20ti%E1%BB%87c%20c%C6%B0%E1%BB%9Bi%20Ho%C3%A0ng%20Gia%2C%20181%20Nguy%E1%BB%85n%20Huy%20T%C6%B0%E1%BB%9Fng%2C%20Thanh%20Xu%C3%A2n%2C%20H%C3%A0%20N%E1%BB%99i',
+      'https://www.google.com/maps/search/?api=1&query=Tr%C3%A0ng%20An%20Palace%2C%20Hei%20Tower%2C%20Ng%E1%BB%A5y%20Nh%C6%B0%20Kon%20Tum%2C%20Thanh%20Xu%C3%A2n%2C%20H%C3%A0%20N%E1%BB%99i',
     schedule: [
       { time: '10:00', title: 'Đón Khách', text: 'Trà bánh và âm nhạc nhẹ nhàng đón quý khách.', icon: 'arrival' },
       { time: '11:00', title: 'Lễ Nạp Tài', text: 'Nghi thức trao sính lễ và lời chúc phúc cho cô dâu.', icon: 'ceremony' },
