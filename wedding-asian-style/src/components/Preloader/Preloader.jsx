@@ -116,9 +116,9 @@ export default function Preloader({ onComplete }) {
           transition={{ duration: 1.1, ease: EASE }}
         >
           <DoubleHappiness
-            gold
+            medallion
             title="Song Hỷ"
-            className="text-7xl drop-shadow-[0_2px_18px_rgba(0,0,0,0.5)] sm:text-8xl"
+            className="h-28 w-28 text-[6.5rem] sm:h-32 sm:w-32 sm:text-[7.5rem]"
           />
         </motion.div>
 

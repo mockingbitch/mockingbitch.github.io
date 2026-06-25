@@ -71,9 +71,9 @@ export default function Hero({ reveal, onCta }) {
       >
         <motion.div variants={item} className="mb-5 sm:mb-6">
           <DoubleHappiness
-            gold
+            medallion
             title="Song Hỷ"
-            className="text-6xl drop-shadow-[0_2px_12px_rgba(0,0,0,0.45)] sm:text-7xl"
+            className="h-24 w-24 text-[5.5rem] sm:h-28 sm:w-28 sm:text-[6.5rem]"
           />
         </motion.div>
 
