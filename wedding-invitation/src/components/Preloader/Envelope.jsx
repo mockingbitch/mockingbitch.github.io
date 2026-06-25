@@ -120,7 +120,7 @@ export default function Envelope({ appear, open }) {
             animate={open ? { opacity: 0 } : { opacity: 1 }}
             transition={{ duration: 0.4 }}
           >
-            <span className="font-display text-base text-ivory/95 sm:text-lg">A&amp;J</span>
+            <span className="font-display text-base text-ivory/95 sm:text-lg">P&amp;D</span>
           </motion.div>
         </motion.div>
       </div>

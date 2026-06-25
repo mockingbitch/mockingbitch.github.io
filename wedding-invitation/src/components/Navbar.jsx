@@ -58,9 +58,9 @@ export default function Navbar({ scrollTo, show }) {
             data-cursor="hover"
             className="font-display text-xl tracking-tight text-charcoal sm:text-2xl"
           >
-            {couple.bride[0]}
+            {couple.groom.split(' ').pop()[0]}
             <span className="text-gold">&amp;</span>
-            {couple.groom[0]}
+            {couple.bride.split(' ').pop()[0]}
           </button>
 
           {/* desktop links */}
