@@ -18,7 +18,7 @@ function EventCard({ event, index }) {
       className="group glass relative flex flex-col items-center overflow-hidden rounded-[1.75rem] p-9 text-center shadow-glass ring-1 ring-transparent transition-all duration-700 hover:-translate-y-2 hover:ring-gold/30 sm:p-11"
     >
       {/* header */}
-      <span className="eyebrow">{event.side}</span>
+      <span className="eyebrow eyebrow--onCard">{event.side}</span>
       <h3 className={`mt-2 font-script text-4xl font-semibold ${accent}`}>{event.rite}</h3>
 
       <div className={`my-7 h-px w-24 bg-gradient-to-r from-transparent to-transparent ${rule}`} />
@@ -54,7 +54,7 @@ function EventCard({ event, index }) {
         target="_blank"
         rel="noreferrer"
         data-cursor="hover"
-        className="group/btn mt-7 inline-flex items-center gap-2 rounded-full bg-white/50 px-6 py-3 text-[0.68rem] font-medium uppercase tracking-[0.26em] text-gold-deep ring-1 ring-gold/25 transition-colors duration-500 hover:bg-white/80"
+        className="group/btn mt-7 inline-flex items-center gap-2 rounded-full bg-lacquer px-6 py-3 text-[0.68rem] font-medium uppercase tracking-[0.26em] text-ivory ring-1 ring-gold/40 transition-colors duration-500 hover:bg-lacquer-deep"
       >
         {event.mapLabel}
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
@@ -88,7 +88,7 @@ export default function WeddingInfo() {
           <Icon name="dress" size={24} />
         </div>
         <span className="eyebrow">{details.dress.label}</span>
-        <h4 className="font-display text-2xl text-charcoal">{details.dress.title}</h4>
+        <h4 className="font-display text-2xl text-champagne">{details.dress.title}</h4>
         <p className="lede max-w-md text-base">{details.dress.text}</p>
       </motion.div>
     </section>

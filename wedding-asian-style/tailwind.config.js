@@ -6,29 +6,35 @@ export default {
       colors: {
         // Asian red & gold palette. Token names kept so components inherit;
         // 'rose-gold' (the romantic accent) is remapped to lacquer red.
-        ivory: '#FBF3EE',
-        cream: '#F7E7DC',
+        ivory: '#FBF3E6',
+        cream: '#F6E7CE',
         champagne: '#F0D9A8',
         gold: '#C9A24B',
         'gold-deep': '#9C7A2C',
         'rose-gold': '#B0182B',
         'soft-pink': '#E8A9A2',
         beige: '#E9D6C2',
-        charcoal: '#2A1512',
-        'charcoal-soft': '#3A201B',
-        ink: '#1A0C0A',
+        charcoal: '#3A1410',
+        'charcoal-soft': '#52201A',
+        ink: '#2A0C0A',
         // Explicit Asian reds (festive accents / 囍)
         lacquer: '#C8102E',
         'lacquer-deep': '#8E0E22',
         'lacquer-bright': '#D62336',
+        // Deep reds for the dominant page / panels
+        'red-bg': '#6E0D14',
+        'red-bg-deep': '#4A0810',
+        'red-panel': '#7E1019',
+        'gold-bright': '#E7C766',
       },
       fontFamily: {
-        display: ['"Playfair Display"', 'serif'],
-        serif: ['"Cormorant Garamond"', 'serif'],
-        bodoni: ['"Bodoni Moda"', 'serif'],
-        sans: ['Manrope', 'Inter', 'system-ui', 'sans-serif'],
-        script: ['"Dancing Script"', 'cursive'],
-        vibes: ['"Great Vibes"', 'cursive'],
+        // Oriental, brush-flavoured, all Vietnamese-safe (verified subsets).
+        display: ['"Charm"', '"Noto Serif"', 'serif'], // brush serif headings
+        serif: ['"Noto Serif"', 'serif'],
+        bodoni: ['"Noto Serif"', 'serif'],
+        sans: ['"Be Vietnam Pro"', 'system-ui', 'sans-serif'],
+        script: ['"Charmonman"', 'cursive'], // brush handwriting
+        vibes: ['"Charmonman"', 'cursive'],
         // 囍 Song Hỷ + CJK glyphs (mirrors the stack in .hy/.hy-gold)
         cjk: [
           '"Noto Serif SC"',

@@ -54,11 +54,11 @@ export default function Hero({ reveal, onCta }) {
         />
       </motion.div>
 
-      {/* Cinematic overlays */}
-      <div className="absolute inset-0 bg-gradient-to-b from-charcoal/55 via-charcoal/25 to-charcoal/75" />
+      {/* Cinematic red-lacquer overlays */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#4a0810]/65 via-[#6e0d14]/30 to-[#3a060c]/85" />
       <div
         className="absolute inset-0"
-        style={{ background: 'radial-gradient(120% 100% at 50% 50%, transparent 45%, rgba(20,17,15,0.6) 100%)' }}
+        style={{ background: 'radial-gradient(120% 100% at 50% 50%, transparent 42%, rgba(58,6,12,0.7) 100%)' }}
       />
 
       {/* Content */}

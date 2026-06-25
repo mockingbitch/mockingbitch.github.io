@@ -37,7 +37,7 @@ function TimelineItem({ item, index }) {
 }
 
 function ScheduleColumn({ event, index }) {
-  const accent = event.accent === 'rose' ? 'text-rose-gold' : 'text-champagne'
+  const accent = event.accent === 'rose' ? 'text-gold-bright' : 'text-champagne'
 
   return (
     <motion.div
@@ -75,7 +75,7 @@ export default function Schedule() {
       id="schedule"
       className="relative overflow-hidden py-28 sm:py-36"
       style={{
-        background: 'radial-gradient(120% 100% at 50% 0%, #2c2622 0%, #1c1815 60%, #161210 100%)',
+        background: 'radial-gradient(120% 100% at 50% 0%, #5a0b12 0%, #3a060c 60%, #2a0509 100%)',
       }}
     >
       <div className="pointer-events-none absolute -left-6 top-10 opacity-40">

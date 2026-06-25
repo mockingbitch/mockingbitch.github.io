@@ -6,23 +6,27 @@
    DESIGN TOKENS
    ============================================================ */
 :root {
-  --ivory: #fbf3ee;
-  --cream: #f7e7dc;
+  --ivory: #fbf3e6; /* warm cream — used for light text & cream cards */
+  --cream: #f6e7ce;
   --champagne: #f0d9a8;
   --gold: #c9a24b;
   --gold-deep: #9c7a2c;
+  --gold-bright: #e7c766;
   --rose-gold: #b0182b;
-  --soft-pink: #e8a9a2; /* soft blossom RED (was pink) to match the theme */
+  --soft-pink: #e8a9a2;
   --beige: #e9d6c2;
-  --charcoal: #2a1512;
-  --ink: #1a0c0a;
+  --charcoal: #3a1410; /* warm dark — text on the cream cards */
+  --ink: #2a0c0a;
   --lacquer: #c8102e;
   --lacquer-deep: #8e0e22;
+  --red-bg: #6e0d14; /* dominant page red */
+  --red-bg-deep: #4a0810;
+  --red-panel: #7e1019;
 
-  --grain-opacity: 0.05;
+  --grain-opacity: 0.06;
   --page-radius: 0px;
 
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 /* ============================================================
@@ -56,13 +60,18 @@ html.lenis body {
 
 body {
   margin: 0;
-  background-color: var(--ivory);
+  /* Deep red is the dominant field; a faint gold brocade lattice + warm glows
+     give it an oriental, lacquered feel. */
+  background-color: var(--red-bg);
   background-image:
-    radial-gradient(60rem 60rem at 85% -8%, rgba(200, 16, 46, 0.08), transparent 60%),
-    radial-gradient(52rem 52rem at -8% 12%, rgba(201, 162, 75, 0.1), transparent 58%);
-  background-attachment: fixed;
-  color: var(--charcoal);
-  font-family: 'Manrope', 'Inter', system-ui, sans-serif;
+    radial-gradient(120% 80% at 50% -10%, rgba(160, 22, 36, 0.7), transparent 60%),
+    radial-gradient(70rem 70rem at 88% -8%, rgba(214, 35, 54, 0.35), transparent 60%),
+    radial-gradient(60rem 60rem at -8% 14%, rgba(201, 162, 75, 0.14), transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30'%3E%3Cg fill='none' stroke='%23E7C766' stroke-width='0.7' opacity='0.5'%3E%3Cpath d='M0 30 L30 0'/%3E%3Cpath d='M0 0 L30 30'/%3E%3C/g%3E%3C/svg%3E");
+  background-attachment: fixed, fixed, fixed, fixed;
+  background-size: auto, auto, auto, 30px 30px;
+  color: var(--ivory);
+  font-family: 'Be Vietnam Pro', system-ui, sans-serif;
   font-feature-settings: 'liga' 1, 'calt' 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -71,7 +80,7 @@ body {
 }
 
 ::selection {
-  background: rgba(200, 16, 46, 0.22);
+  background: rgba(231, 199, 102, 0.3);
   color: var(--ink);
 }
 
@@ -94,11 +103,11 @@ body {
   .eyebrow {
     @apply font-sans uppercase text-[0.7rem] sm:text-xs font-medium;
     letter-spacing: 0.42em;
-    color: var(--lacquer);
+    color: var(--gold-bright); /* gold reads on the red field */
   }
-  /* On dark sections the red eyebrow fails contrast — switch to champagne. */
-  .eyebrow--light {
-    color: var(--champagne);
+  /* For the few eyebrows that sit on a cream card, use deep red instead. */
+  .eyebrow--onCard {
+    color: var(--lacquer);
   }
 
   /* 囍 Song Hỷ — the double-happiness mark. Full CJK fallback stack so a real
@@ -135,27 +144,35 @@ body {
   }
 
   .display-fluid {
-    font-family: 'Playfair Display', serif;
-    line-height: 0.95;
+    font-family: 'Charm', 'Noto Serif', serif;
+    line-height: 0.98;
     font-size: clamp(3rem, 11vw, 9.5rem);
-    font-weight: 500;
-    letter-spacing: -0.01em;
+    font-weight: 700;
+    letter-spacing: 0;
   }
 
   .section-title {
-    font-family: 'Playfair Display', serif;
-    font-weight: 500;
-    line-height: 1.02;
+    font-family: 'Charm', 'Noto Serif', serif;
+    font-weight: 700;
+    line-height: 1.06;
     font-size: clamp(2.2rem, 6vw, 4.7rem);
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
+    color: var(--champagne);
   }
 
   .lede {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(1.15rem, 2.1vw, 1.6rem);
-    line-height: 1.5;
+    font-family: 'Noto Serif', serif;
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    line-height: 1.6;
     font-weight: 400;
-    color: rgba(35, 31, 28, 0.74);
+    color: rgba(251, 243, 230, 0.82); /* cream, readable on red */
+  }
+
+  /* Cream "rice-paper" card sitting on the red field. */
+  .ink-panel {
+    background: linear-gradient(160deg, #fdf6ea, #f4e6cd);
+    border: 1px solid rgba(156, 122, 44, 0.4);
+    box-shadow: 0 24px 60px -28px rgba(40, 6, 6, 0.7);
   }
 }
 
@@ -182,30 +199,28 @@ body {
     animation: shimmer 5s linear infinite;
   }
 
+  /* On the red field, "glass" reads as a warm cream rice-paper panel so the
+     dark card text stays readable. */
   .glass {
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.55),
-      rgba(255, 255, 255, 0.18)
-    );
-    backdrop-filter: blur(16px) saturate(135%);
-    -webkit-backdrop-filter: blur(16px) saturate(135%);
-    border: 1px solid rgba(255, 255, 255, 0.55);
+    background: linear-gradient(160deg, rgba(253, 246, 234, 0.96), rgba(244, 230, 205, 0.92));
+    backdrop-filter: blur(8px) saturate(120%);
+    -webkit-backdrop-filter: blur(8px) saturate(120%);
+    border: 1px solid rgba(156, 122, 44, 0.45);
   }
 
   .glass-dark {
     background: linear-gradient(
       135deg,
-      rgba(35, 31, 28, 0.55),
-      rgba(35, 31, 28, 0.25)
+      rgba(74, 8, 16, 0.62),
+      rgba(40, 6, 6, 0.42)
     );
     backdrop-filter: blur(18px) saturate(120%);
     -webkit-backdrop-filter: blur(18px) saturate(120%);
-    border: 1px solid rgba(231, 210, 174, 0.22);
+    border: 1px solid rgba(231, 199, 102, 0.3);
   }
 
   .hairline {
-    border: 1px solid rgba(164, 126, 59, 0.22);
+    border: 1px solid rgba(201, 162, 75, 0.3);
   }
 
   .gold-rule {

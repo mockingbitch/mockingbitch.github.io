@@ -123,7 +123,7 @@ export default function Wishes() {
         transition={{ duration: 1, ease: EASE }}
         className="relative mx-auto mt-12 max-w-2xl"
       >
-        <div className="pointer-events-none absolute -inset-6 -z-10 rounded-[2rem] bg-gradient-to-br from-soft-pink/40 via-champagne/25 to-transparent blur-2xl" />
+        <div className="pointer-events-none absolute -inset-6 -z-10 rounded-[2rem] bg-gradient-to-br from-champagne/30 via-gold/15 to-transparent blur-2xl" />
         <form onSubmit={onSubmit} className="glass rounded-[1.75rem] p-8 shadow-glass sm:p-10">
           <label className="group block text-left">
             <span className="font-sans text-[0.62rem] uppercase tracking-[0.28em] text-charcoal/55">
@@ -199,15 +199,15 @@ export default function Wishes() {
       <div className="mx-auto mt-16 max-w-4xl">
         <div className="mb-8 flex items-center justify-center gap-4">
           <span className="h-px w-10 bg-gold/40" />
-          <h3 className="text-center font-display text-2xl text-charcoal">
+          <h3 className="text-center font-display text-2xl text-champagne">
             {copy.wallTitle}
-            {list.length > 0 && <span className="ml-2 text-gold/70">({list.length})</span>}
+            {list.length > 0 && <span className="ml-2 text-champagne/70">({list.length})</span>}
           </h3>
           <span className="h-px w-10 bg-gold/40" />
         </div>
 
         {list.length === 0 ? (
-          <p className="text-center font-serif text-xl italic text-charcoal/55">{copy.emptyState}</p>
+          <p className="text-center font-serif text-xl italic text-ivory/75">{copy.emptyState}</p>
         ) : (
           <div className="columns-1 gap-5 sm:columns-2">
             <AnimatePresence initial={false}>

@@ -16,7 +16,7 @@ export default function Quote() {
   return (
     <section className="relative overflow-hidden py-32 sm:py-44">
       {/* soft glow accent */}
-      <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[60vh] w-[60vh] -translate-x-1/2 -translate-y-1/2 rounded-full bg-soft-pink/40 blur-[120px]" />
+      <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[60vh] w-[60vh] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/20 blur-[120px]" />
 
       <div className="relative mx-auto max-w-4xl px-6 text-center">
         {/* giant quotation mark */}
@@ -36,13 +36,13 @@ export default function Quote() {
           text={quote.text}
           stagger={0.09}
           duration={1.1}
-          className="font-display text-3xl leading-tight text-charcoal sm:text-5xl md:text-6xl"
+          className="font-display text-3xl leading-tight text-champagne sm:text-5xl md:text-6xl"
         />
 
         {/* handwritten signature */}
         <div className="mt-14 flex flex-col items-center">
           <motion.span
-            className="font-script text-5xl font-semibold text-rose-gold sm:text-6xl"
+            className="font-script text-5xl font-bold text-gold-bright sm:text-6xl"
             initial={{ clipPath: 'inset(0 100% 0 0)' }}
             whileInView={{ clipPath: 'inset(0 0% 0 0)' }}
             viewport={viewport}

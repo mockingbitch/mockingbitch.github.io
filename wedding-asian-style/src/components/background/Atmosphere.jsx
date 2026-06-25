@@ -8,8 +8,8 @@ import { motion } from 'framer-motion'
 export default function Atmosphere() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-      {/* Base wash */}
-      <div className="absolute inset-0 bg-ivory" />
+      {/* Base wash — deep lacquer red */}
+      <div className="absolute inset-0 bg-red-bg" />
 
       {/* Animated gradient mesh */}
       <div
@@ -60,7 +60,7 @@ export default function Atmosphere() {
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(120% 120% at 50% 40%, transparent 55%, rgba(35,31,28,0.10) 100%)',
+            'radial-gradient(120% 120% at 50% 40%, transparent 50%, rgba(46,5,9,0.45) 100%)',
         }}
       />
     </div>

@@ -25,17 +25,13 @@ export default function SectionHeading({
           initial="hidden"
           whileInView="show"
           viewport={viewport}
-          className={`eyebrow mb-5 ${light ? 'eyebrow--light' : ''}`}
+          className="eyebrow mb-5"
         >
           {eyebrow}
         </motion.span>
       )}
 
-      <SplitText
-        as="h2"
-        text={title}
-        className={`section-title ${light ? 'text-ivory' : 'text-charcoal'}`}
-      />
+      <SplitText as="h2" text={title} className="section-title text-champagne" />
 
       {align === 'center' && <Ornament className="my-7 opacity-90" width={210} />}
 

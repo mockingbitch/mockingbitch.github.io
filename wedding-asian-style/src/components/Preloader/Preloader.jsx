@@ -70,7 +70,7 @@ export default function Preloader({ onComplete }) {
       className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden grain"
       style={{
         background:
-          'radial-gradient(120% 120% at 50% 30%, #2a2420 0%, #1a1613 55%, #100d0b 100%)',
+          'radial-gradient(120% 120% at 50% 30%, #7e1019 0%, #4a0810 55%, #2e0509 100%)',
       }}
       initial={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 1.06, filter: 'blur(6px)', transition: { duration: 1.1, ease: EASE } }}

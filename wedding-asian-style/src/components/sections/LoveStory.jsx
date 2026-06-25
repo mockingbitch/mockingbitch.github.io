@@ -54,10 +54,10 @@ function Milestone({ data, index }) {
             <div className="absolute inset-0 bg-gradient-to-t from-charcoal/40 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
           </div>
           <div className={`p-7 ${isLeft ? 'md:items-end' : ''}`}>
-            <span className="font-display text-5xl text-gold/80">{data.year}</span>
-            <p className="eyebrow mt-1">{data.month}</p>
+            <span className="font-display text-5xl text-gold-deep">{data.year}</span>
+            <p className="eyebrow eyebrow--onCard mt-1">{data.month}</p>
             <h3 className="mt-3 font-display text-2xl text-charcoal">{data.title}</h3>
-            <p className="lede mt-3 text-base">{data.text}</p>
+            <p className="lede mt-3 text-base text-charcoal/85">{data.text}</p>
           </div>
         </div>
       </motion.div>
@@ -105,7 +105,7 @@ export default function LoveStory() {
         initial="hidden"
         whileInView="show"
         viewport={viewport}
-        className="mx-auto mt-20 max-w-md text-center font-serif text-2xl italic text-rose-gold"
+        className="mx-auto mt-20 max-w-md text-center font-serif text-2xl italic text-champagne"
       >
         …và chương đẹp nhất vẫn đang được viết tiếp.
       </motion.p>

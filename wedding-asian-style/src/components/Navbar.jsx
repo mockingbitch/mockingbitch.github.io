@@ -49,7 +49,7 @@ export default function Navbar({ scrollTo, show }) {
         animate={{ y: show ? 0 : -100 }}
         transition={{ duration: 0.9, ease: EASE }}
         className={`fixed inset-x-0 top-0 z-[90] transition-colors duration-500 ${
-          scrolled ? 'glass border-b border-white/40' : ''
+          scrolled ? 'glass-dark border-b border-gold/20' : ''
         }`}
       >
         <nav className="mx-auto flex max-w-content items-center justify-between px-6 py-4 sm:px-8">
@@ -60,7 +60,7 @@ export default function Navbar({ scrollTo, show }) {
             aria-label={`${couple.bride} & ${couple.groom}`}
             className="leading-none"
           >
-            <DoubleHappiness className="text-3xl sm:text-4xl" />
+            <DoubleHappiness gold className="text-3xl sm:text-4xl" />
           </button>
 
           {/* desktop links */}
@@ -70,7 +70,7 @@ export default function Navbar({ scrollTo, show }) {
                 <button
                   onClick={() => handleNav(item.id)}
                   data-cursor="hover"
-                  className="group relative font-sans text-[0.7rem] uppercase tracking-[0.24em] text-charcoal/70 transition-colors hover:text-charcoal"
+                  className="group relative font-sans text-[0.7rem] uppercase tracking-[0.24em] text-ivory/80 transition-colors hover:text-champagne"
                 >
                   {item.label}
                   <span
@@ -90,9 +90,9 @@ export default function Navbar({ scrollTo, show }) {
             aria-label="Menu"
             className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 lg:hidden"
           >
-            <motion.span animate={{ rotate: open ? 45 : 0, y: open ? 4 : 0 }} className="h-px w-6 bg-charcoal" />
-            <motion.span animate={{ opacity: open ? 0 : 1 }} className="h-px w-6 bg-charcoal" />
-            <motion.span animate={{ rotate: open ? -45 : 0, y: open ? -4 : 0 }} className="h-px w-6 bg-charcoal" />
+            <motion.span animate={{ rotate: open ? 45 : 0, y: open ? 4 : 0 }} className={`h-px w-6 ${open ? 'bg-charcoal' : 'bg-ivory'}`} />
+            <motion.span animate={{ opacity: open ? 0 : 1 }} className={`h-px w-6 ${open ? 'bg-charcoal' : 'bg-ivory'}`} />
+            <motion.span animate={{ rotate: open ? -45 : 0, y: open ? -4 : 0 }} className={`h-px w-6 ${open ? 'bg-charcoal' : 'bg-ivory'}`} />
           </button>
         </nav>
 

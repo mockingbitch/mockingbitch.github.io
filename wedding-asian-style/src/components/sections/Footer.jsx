@@ -9,7 +9,7 @@ export default function Footer({ scrollTo }) {
     <footer
       className="relative overflow-hidden px-6 pb-12 pt-28 text-center text-ivory sm:pt-36"
       style={{
-        background: 'radial-gradient(120% 120% at 50% 0%, #2c2622 0%, #1a1613 60%, #120f0d 100%)',
+        background: 'radial-gradient(120% 120% at 50% 0%, #5a0b12 0%, #3a060c 60%, #2a0509 100%)',
       }}
     >
       <div className="pointer-events-none absolute -left-8 -top-4 opacity-30">
@@ -42,7 +42,7 @@ export default function Footer({ scrollTo }) {
           {footer.date} · {couple.city}
         </motion.p>
 
-        <motion.p variants={fadeUp} initial="hidden" whileInView="show" viewport={viewport} className="mt-4 font-vibes text-3xl text-rose-gold">
+        <motion.p variants={fadeUp} initial="hidden" whileInView="show" viewport={viewport} className="mt-4 font-vibes text-3xl text-gold-bright">
           {couple.hashtag}
         </motion.p>
 

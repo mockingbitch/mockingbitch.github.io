@@ -16,7 +16,7 @@ export default function QRCard({ data, index = 0 }) {
       data-cursor="hover"
       className="group glass relative flex w-full max-w-xs flex-col items-center rounded-2xl p-7 text-center shadow-glass ring-1 ring-transparent transition-all duration-700 hover:-translate-y-2 hover:ring-gold/35"
     >
-      <span className="eyebrow">{data.side}</span>
+      <span className="eyebrow eyebrow--onCard">{data.side}</span>
 
       <div className="relative mt-5 rounded-2xl bg-white p-4 shadow-glass">
         {/* corner ticks */}
@@ -45,7 +45,7 @@ export default function QRCard({ data, index = 0 }) {
         <p className="mt-1 font-serif text-base text-charcoal/70">{data.bank}</p>
       )}
       {data.account && (
-        <p className="mt-0.5 font-sans text-sm tracking-[0.18em] text-gold-deep">{data.account}</p>
+        <p className="mt-0.5 font-sans text-sm tracking-[0.18em] text-charcoal">{data.account}</p>
       )}
     </motion.div>
   )
