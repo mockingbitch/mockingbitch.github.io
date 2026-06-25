@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" rx="14" fill="#C8102E" />
+  <rect x="2.5" y="2.5" width="59" height="59" rx="11.5" fill="none" stroke="#F0D9A8" stroke-opacity="0.85" stroke-width="2" />
+  <text x="50%" y="53%" text-anchor="middle" dominant-baseline="central"
+        font-family="'Noto Serif SC','Microsoft YaHei','PingFang SC','Hiragino Sans GB',serif"
+        font-size="40" font-weight="900" fill="#F4E3B0">囍</text>
+</svg>

@@ -1,0 +1,271 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+  --ivory: #fbf3ee;
+  --cream: #f7e7dc;
+  --champagne: #f0d9a8;
+  --gold: #c9a24b;
+  --gold-deep: #9c7a2c;
+  --rose-gold: #b0182b;
+  --soft-pink: #e8a9a2; /* soft blossom RED (was pink) to match the theme */
+  --beige: #e9d6c2;
+  --charcoal: #2a1512;
+  --ink: #1a0c0a;
+  --lacquer: #c8102e;
+  --lacquer-deep: #8e0e22;
+
+  --grain-opacity: 0.05;
+  --page-radius: 0px;
+
+  color-scheme: light;
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: auto; /* Lenis handles smooth scrolling */
+  -webkit-text-size-adjust: 100%;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  background-color: var(--ivory);
+  background-image:
+    radial-gradient(60rem 60rem at 85% -8%, rgba(200, 16, 46, 0.08), transparent 60%),
+    radial-gradient(52rem 52rem at -8% 12%, rgba(201, 162, 75, 0.1), transparent 58%);
+  background-attachment: fixed;
+  color: var(--charcoal);
+  font-family: 'Manrope', 'Inter', system-ui, sans-serif;
+  font-feature-settings: 'liga' 1, 'calt' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(200, 16, 46, 0.22);
+  color: var(--ink);
+}
+
+/* Custom scrollbar (visible on non-Lenis fallback) */
+::-webkit-scrollbar {
+  width: 9px;
+}
+::-webkit-scrollbar-track {
+  background: var(--cream);
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--lacquer), var(--gold-deep));
+  border-radius: 999px;
+}
+
+/* ============================================================
+   TYPOGRAPHY HELPERS
+   ============================================================ */
+@layer components {
+  .eyebrow {
+    @apply font-sans uppercase text-[0.7rem] sm:text-xs font-medium;
+    letter-spacing: 0.42em;
+    color: var(--lacquer);
+  }
+  /* On dark sections the red eyebrow fails contrast — switch to champagne. */
+  .eyebrow--light {
+    color: var(--champagne);
+  }
+
+  /* 囍 Song Hỷ — the double-happiness mark. Full CJK fallback stack so a real
+     glyph shows even before the Noto Serif SC subset loads / if it fails. */
+  .hy {
+    font-family: 'Noto Serif SC', 'Microsoft YaHei', 'PingFang SC',
+      'Hiragino Sans GB', 'Noto Sans CJK SC', serif;
+    font-weight: 900;
+    color: var(--lacquer);
+    line-height: 1;
+    display: inline-block;
+  }
+  .hy-gold {
+    font-family: 'Noto Serif SC', 'Microsoft YaHei', 'PingFang SC',
+      'Hiragino Sans GB', 'Noto Sans CJK SC', serif;
+    font-weight: 900;
+    line-height: 1;
+    display: inline-block;
+    background: linear-gradient(100deg, #9c7a2c 0%, #f0d9a8 40%, #c9a24b 60%, #9c7a2c 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  /* Fallback: if background-clip:text is unsupported, render solid gold
+     instead of an invisible (transparent) glyph. */
+  @supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+    .hy-gold {
+      background: none;
+      color: var(--gold);
+      -webkit-text-fill-color: currentColor;
+    }
+  }
+
+  .display-fluid {
+    font-family: 'Playfair Display', serif;
+    line-height: 0.95;
+    font-size: clamp(3rem, 11vw, 9.5rem);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    line-height: 1.02;
+    font-size: clamp(2.2rem, 6vw, 4.7rem);
+    letter-spacing: -0.01em;
+  }
+
+  .lede {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.15rem, 2.1vw, 1.6rem);
+    line-height: 1.5;
+    font-weight: 400;
+    color: rgba(35, 31, 28, 0.74);
+  }
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+@layer utilities {
+  .text-gold-gradient {
+    background: linear-gradient(100deg, #a47e3b 0%, #e7d2ae 38%, #c5a05c 62%, #a47e3b 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  .text-gold-shimmer {
+    background: linear-gradient(100deg, #a47e3b 0%, #f2e3c5 30%, #c5a05c 50%, #f2e3c5 70%, #a47e3b 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: shimmer 5s linear infinite;
+  }
+
+  .glass {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.55),
+      rgba(255, 255, 255, 0.18)
+    );
+    backdrop-filter: blur(16px) saturate(135%);
+    -webkit-backdrop-filter: blur(16px) saturate(135%);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+  }
+
+  .glass-dark {
+    background: linear-gradient(
+      135deg,
+      rgba(35, 31, 28, 0.55),
+      rgba(35, 31, 28, 0.25)
+    );
+    backdrop-filter: blur(18px) saturate(120%);
+    -webkit-backdrop-filter: blur(18px) saturate(120%);
+    border: 1px solid rgba(231, 210, 174, 0.22);
+  }
+
+  .hairline {
+    border: 1px solid rgba(164, 126, 59, 0.22);
+  }
+
+  .gold-rule {
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    height: 1px;
+  }
+
+  .grain::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: var(--grain-opacity);
+    z-index: 60;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px;
+    mix-blend-mode: multiply;
+  }
+
+  .mask-fade-y {
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+  }
+
+  .perspective {
+    perspective: 1600px;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  /* Hide native cursor only on devices that have a precise pointer */
+  @media (pointer: fine) {
+    .cursor-none-fine,
+    .cursor-none-fine * {
+      cursor: none !important;
+    }
+  }
+}
+
+/* Reveal helper for line-by-line text masking */
+.reveal-line {
+  display: block;
+  overflow: hidden;
+}
+
+/* Reduced motion: keep things calm and accessible */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
