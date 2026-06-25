@@ -15,11 +15,11 @@ export const couple = {
   groomFull: 'Nguyễn Quang Phong',
   hashtag: '#ThuyDungQuangPhong',
   // Ngày dùng cho đồng hồ đếm ngược + màn mở đầu (lấy buổi tiệc diễn ra trước).
-  date: '2026-09-12T11:00:00',
-  dateShort: '12 · 09 · 2026',
-  datesShort: '12 & 13 · 09 · 2026',
+  date: '2026-08-02T11:00:00',
+  dateShort: '02 · 08 · 2026',
+  datesShort: '02 & 08 · 08 · 2026',
   year: '2026',
-  city: 'Đà Lạt, Việt Nam',
+  city: 'Hà Nội & Thanh Hóa',
   tagline: 'Hai câu chuyện, hòa làm một.',
 }
 
@@ -76,19 +76,20 @@ export const events = [
   {
     key: 'bride',
     side: 'Tiệc Nhà Gái',
-    rite: 'Lễ Vu Quy',
+    rite: 'Lễ Nạp Tài',
     accent: 'rose', // 'rose' | 'gold'
-    weekday: 'Thứ Bảy',
-    date: '2026-09-12T11:00:00',
-    dateShort: '12 · 09 · 2026',
+    weekday: 'Chủ Nhật',
+    date: '2026-08-02T11:00:00',
+    dateShort: '02 · 08 · 2026',
     time: '11:00',
-    venue: 'Tư Gia Nhà Gái',
-    address: ['12 Đường Hoa Hồng', 'Phường 8, TP. Đà Lạt', 'Lâm Đồng'],
+    venue: 'Trung Tâm Tiệc Cưới Hoàng Gia',
+    address: ['Số 181 Nguyễn Huy Tưởng', 'Quận Thanh Xuân', 'Hà Nội'],
     mapLabel: 'Mở bản đồ',
-    mapHref: 'https://maps.google.com/?q=Da+Lat+Vietnam',
+    mapHref:
+      'https://www.google.com/maps/search/?api=1&query=Trung%20t%C3%A2m%20ti%E1%BB%87c%20c%C6%B0%E1%BB%9Bi%20Ho%C3%A0ng%20Gia%2C%20181%20Nguy%E1%BB%85n%20Huy%20T%C6%B0%E1%BB%9Fng%2C%20Thanh%20Xu%C3%A2n%2C%20H%C3%A0%20N%E1%BB%99i',
     schedule: [
       { time: '10:00', title: 'Đón Khách', text: 'Trà bánh và âm nhạc nhẹ nhàng đón quý khách.', icon: 'arrival' },
-      { time: '11:00', title: 'Lễ Vu Quy', text: 'Nghi thức trao lời chúc phúc cho cô dâu.', icon: 'ceremony' },
+      { time: '11:00', title: 'Lễ Nạp Tài', text: 'Nghi thức trao sính lễ và lời chúc phúc cho cô dâu.', icon: 'ceremony' },
       { time: '11:30', title: 'Khai Tiệc', text: 'Nâng ly mừng hạnh phúc đôi uyên ương.', icon: 'cocktail' },
       { time: '12:00', title: 'Dùng Bữa & Lời Chúc', text: 'Bữa tiệc thân mật cùng gia đình hai bên.', icon: 'dinner' },
     ],
@@ -98,14 +99,15 @@ export const events = [
     side: 'Tiệc Nhà Trai',
     rite: 'Lễ Tân Hôn',
     accent: 'gold',
-    weekday: 'Chủ Nhật',
-    date: '2026-09-13T11:00:00',
-    dateShort: '13 · 09 · 2026',
+    weekday: 'Thứ Bảy',
+    date: '2026-08-08T11:00:00',
+    dateShort: '08 · 08 · 2026',
     time: '11:00',
-    venue: 'Trung Tâm Tiệc Cưới Maison',
-    address: ['88 Đường Trần Hưng Đạo', 'Phường 10, TP. Đà Lạt', 'Lâm Đồng'],
+    venue: 'Tư Gia Nhà Trai',
+    address: ['Đường 217', 'Thị Trấn Hà Trung', 'Thanh Hóa'],
     mapLabel: 'Mở bản đồ',
-    mapHref: 'https://maps.google.com/?q=Da+Lat+Vietnam',
+    mapHref:
+      'https://www.google.com/maps/search/?api=1&query=%C4%90%C6%B0%E1%BB%9Dng%20217%2C%20Th%E1%BB%8B%20Tr%E1%BA%A5n%20H%C3%A0%20Trung%2C%20Thanh%20H%C3%B3a',
     schedule: [
       { time: '10:30', title: 'Đón Khách', text: 'Welcome drink và chụp ảnh lưu niệm.', icon: 'arrival' },
       { time: '11:00', title: 'Lễ Tân Hôn', text: 'Nghi thức thành hôn trước họ hàng đôi bên.', icon: 'ceremony' },
@@ -202,7 +204,7 @@ export const wishes = {
 export const footer = {
   message: 'Chúng mình rất mong được cùng bạn chung vui trong ngày trọng đại.',
   names: 'Thùy Dung & Quang Phong',
-  date: '12 & 13 · 09 · 2026',
+  date: '02 & 08 · 08 · 2026',
   credit: 'Thực hiện với tình yêu',
 }
 
