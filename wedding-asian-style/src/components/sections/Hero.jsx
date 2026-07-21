@@ -91,11 +91,11 @@ export default function Hero({ reveal, onCta }) {
           className="mt-4 font-display leading-[0.96]"
           style={{ fontSize: 'clamp(2.7rem, 12vw, 10.5rem)' }}
         >
-          <span className="block">{couple.bride}</span>
+          <span className="block">{couple.groom}</span>
           <span className="my-1 block font-serif text-3xl italic text-gold-shimmer sm:my-2 sm:text-5xl">
             &amp;
           </span>
-          <span className="block">{couple.groom}</span>
+          <span className="block">{couple.bride}</span>
         </motion.h1>
 
         <motion.p variants={item} className="mt-6 font-serif text-xl italic text-ivory/85 sm:text-2xl">

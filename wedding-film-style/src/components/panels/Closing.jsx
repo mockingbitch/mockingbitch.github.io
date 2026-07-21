@@ -27,9 +27,9 @@ export default function Closing({ no, total }) {
           variants={fadeUp}
           className="display mt-6 text-[clamp(2.4rem,7vw,5rem)] text-paper"
         >
-          {couple.bride}
-          <span className="mx-2 italic text-bronze sm:mx-3">&amp;</span>
           {couple.groom}
+          <span className="mx-2 italic text-bronze sm:mx-3">&amp;</span>
+          {couple.bride}
         </motion.h2>
         <motion.div variants={fadeUp} className="mt-6 flex items-center justify-center gap-4">
           <span className="h-px w-10 bg-bronze/60" />

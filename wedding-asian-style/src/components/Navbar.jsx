@@ -57,7 +57,7 @@ export default function Navbar({ scrollTo, show }) {
           <button
             onClick={() => handleNav('hero')}
             data-cursor="hover"
-            aria-label={`${couple.bride} & ${couple.groom}`}
+            aria-label={`${couple.groom} & ${couple.bride}`}
             className="leading-none"
           >
             <DoubleHappiness gold className="text-3xl sm:text-4xl" />

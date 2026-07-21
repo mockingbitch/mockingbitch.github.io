@@ -59,9 +59,9 @@ export default function Envelope({ appear, open }) {
             <div className="my-3 h-px w-12 bg-gold/50" />
             <span className="font-script text-2xl text-rose-gold">Lễ thành hôn của</span>
             <h3 className="mt-2 font-display text-2xl leading-tight text-charcoal sm:text-[1.7rem]">
-              {couple.bride}
-              <span className="mx-1.5 text-gold">&amp;</span>
               {couple.groom}
+              <span className="mx-1.5 text-gold">&amp;</span>
+              {couple.bride}
             </h3>
             <span className="mt-3 font-serif text-sm tracking-[0.3em] text-charcoal/70">
               {couple.dateShort}

@@ -33,9 +33,9 @@ export default function Footer({ scrollTo }) {
           transition={{ duration: 1.2, ease: EASE }}
           className="font-display text-5xl text-ivory sm:text-7xl"
         >
-          {couple.bride}
-          <span className="mx-3 text-gold-shimmer">&amp;</span>
           {couple.groom}
+          <span className="mx-3 text-gold-shimmer">&amp;</span>
+          {couple.bride}
         </motion.h2>
 
         <motion.p variants={fadeUp} initial="hidden" whileInView="show" viewport={viewport} className="mt-5 font-sans text-sm uppercase tracking-[0.4em] text-champagne/80">

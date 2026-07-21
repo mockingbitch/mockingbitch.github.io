@@ -30,9 +30,9 @@ export default function Cover({ no, total }) {
           variants={fadeUp}
           className="display mt-4 text-[clamp(3rem,9vw,7rem)] text-paper"
         >
-          {couple.bride}
-          <span className="mx-2 italic text-bronze sm:mx-3">&amp;</span>
           {couple.groom}
+          <span className="mx-2 italic text-bronze sm:mx-3">&amp;</span>
+          {couple.bride}
         </motion.h1>
         <motion.p variants={fadeUp} className="lede mt-5 max-w-md text-paper/85">
           {couple.tagline}

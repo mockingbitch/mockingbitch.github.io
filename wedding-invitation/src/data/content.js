@@ -17,7 +17,7 @@ export const couple = {
   groom: 'Quang Phong',
   brideFull: 'Nguyễn Thùy Dung',
   groomFull: 'Trần Quang Phong',
-  hashtag: '#ThuyDungQuangPhong',
+  hashtag: '#QuangPhongThuyDung',
   // Ngày dùng cho đồng hồ đếm ngược + màn mở đầu (lấy buổi tiệc diễn ra trước).
   date: '2026-08-02T11:00:00',
   dateShort: '02 · 08 · 2026',
@@ -31,7 +31,7 @@ export const hero = {
   kicker: 'Cùng với gia đình hai bên',
   invite: 'trân trọng kính mời bạn đến chung vui',
   image: photo('DAT_8553.jpg'),
-  imageAlt: 'Thùy Dung và Quang Phong bên đài phun nước trong khu vườn',
+  imageAlt: 'Quang Phong và Thùy Dung bên đài phun nước trong khu vườn',
   scrollHint: 'Bắt đầu câu chuyện',
 }
 
@@ -161,7 +161,7 @@ export const gallery = {
 export const quote = {
   text: 'Và bỗng nhiên, mọi bản tình ca đều viết về anh và em.',
   attribution: 'Yêu, mãi mãi',
-  signature: 'Thùy Dung & Quang Phong',
+  signature: 'Quang Phong & Thùy Dung',
 }
 
 // ============================================================
@@ -211,7 +211,7 @@ export const wishes = {
 
 export const footer = {
   message: 'Chúng mình rất mong được cùng bạn chung vui trong ngày trọng đại.',
-  names: 'Thùy Dung & Quang Phong',
+  names: 'Quang Phong & Thùy Dung',
   date: '02 & 08 · 08 · 2026',
   credit: 'Thực hiện với tình yêu',
 }

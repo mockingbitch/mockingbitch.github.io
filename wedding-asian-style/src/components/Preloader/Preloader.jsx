@@ -156,9 +156,9 @@ export default function Preloader({ onComplete }) {
           animate={reached('names') ? { opacity: 1, y: 0 } : { opacity: 0, y: 26 }}
           transition={{ duration: 1.2, ease: EASE, delay: 0.15 }}
         >
-          {couple.bride}
-          <span className="mx-3 text-gold-shimmer">&amp;</span>
           {couple.groom}
+          <span className="mx-3 text-gold-shimmer">&amp;</span>
+          {couple.bride}
         </motion.h1>
       </motion.div>
 
