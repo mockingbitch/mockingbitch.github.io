@@ -37,10 +37,15 @@ export default function Gifts({ no, total }) {
                 className="flex flex-col items-center border border-line p-7"
               >
                 <span className="kicker">{q.side}</span>
-                <div className="mt-4 rounded-lg bg-paper p-3">
-                  {q.image ? (
-                    <img src={q.image} alt={`QR ${q.side}`} className="h-32 w-32" />
-                  ) : (
+                {q.image ? (
+                  <img
+                    src={q.image}
+                    alt={`QR ${q.side}`}
+                    className="mt-4 w-40 max-w-full rounded-lg"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="mt-4 rounded-lg bg-paper p-3">
                     <QRCodeSVG
                       value={q.value}
                       size={128}
@@ -48,8 +53,8 @@ export default function Gifts({ no, total }) {
                       fgColor="#100F0C"
                       level="M"
                     />
-                  )}
-                </div>
+                  </div>
+                )}
                 <p className="mt-4 font-display text-lg text-paper">{q.name}</p>
                 {q.bank && <p className="mt-1 text-sm text-muted">{q.bank}</p>}
                 {q.account && (

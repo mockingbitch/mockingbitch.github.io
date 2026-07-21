@@ -18,17 +18,17 @@ export default function QRCard({ data, index = 0 }) {
     >
       <span className="eyebrow">{data.side}</span>
 
-      <div className="relative mt-5 rounded-2xl bg-white p-4 shadow-glass">
-        {/* corner ticks */}
-        <span className="pointer-events-none absolute inset-2 rounded-xl border border-gold/20" />
-        {data.image ? (
-          <img
-            src={data.image}
-            alt={`Mã QR ${data.side}`}
-            className="h-[168px] w-[168px] rounded-md object-contain"
-            loading="lazy"
-          />
-        ) : (
+      {data.image ? (
+        <img
+          src={data.image}
+          alt={`Mã QR ${data.side}`}
+          className="mt-5 w-56 max-w-full rounded-2xl shadow-glass"
+          loading="lazy"
+        />
+      ) : (
+        <div className="relative mt-5 rounded-2xl bg-white p-4 shadow-glass">
+          {/* corner ticks */}
+          <span className="pointer-events-none absolute inset-2 rounded-xl border border-gold/20" />
           <QRCodeSVG
             value={data.value}
             size={168}
@@ -37,8 +37,8 @@ export default function QRCard({ data, index = 0 }) {
             fgColor="#231f1c"
             includeMargin={false}
           />
-        )}
-      </div>
+        </div>
+      )}
 
       <h3 className="mt-5 font-display text-xl text-charcoal">{data.name}</h3>
       {data.bank && (
