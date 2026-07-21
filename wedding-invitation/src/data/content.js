@@ -182,7 +182,7 @@ export const gifts = {
       account: '0374110298',
       value:
         '00020101021138540010A00000072701240006970422011003741102980208QRIBFTTA5204000053037045802VN62250821Mung cuoi Quang Phong6304116F',
-      image: null,
+      image: photo('qr-chure.jpeg'),
     },
     {
       side: 'Nhà Gái',
@@ -191,7 +191,7 @@ export const gifts = {
       account: '1023882766',
       value:
         '00020101021138540010A00000072701240006970436011010238827660208QRIBFTTA5204000053037045802VN62230819Mung cuoi Thuy Dung63044D7B',
-      image: null,
+      image: photo('qr-codau.jpeg'),
     },
   ],
 }
