@@ -111,7 +111,7 @@ export const events = [
     address: ['Đường 217', 'Thị Trấn Hà Trung', 'Thanh Hóa'],
     mapLabel: 'Mở bản đồ',
     mapHref:
-      'https://www.google.com/maps/search/?api=1&query=%C4%90%C6%B0%E1%BB%9Dng%20217%2C%20Th%E1%BB%8B%20Tr%E1%BA%A5n%20H%C3%A0%20Trung%2C%20Thanh%20H%C3%B3a',
+      'https://maps.app.goo.gl/3aUFk8wZssK7rUwi6',
     schedule: [
       { time: '10:30', title: 'Đón Khách', text: 'Welcome drink và chụp ảnh lưu niệm.', icon: 'arrival' },
       { time: '11:00', title: 'Lễ Tân Hôn', text: 'Nghi thức thành hôn trước họ hàng đôi bên.', icon: 'ceremony' },
