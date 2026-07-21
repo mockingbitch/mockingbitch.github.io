@@ -8,6 +8,10 @@
 const img = (id, w = 1600) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`
 
+// Ảnh cưới thật — đặt trong wedding-invitation/public/photos/ và được build ra
+// /wedding/photos/. Dùng BASE_URL để đường dẫn đúng khi triển khai dưới /wedding/.
+const photo = (name) => `${import.meta.env.BASE_URL}photos/${name}`
+
 export const couple = {
   bride: 'Thùy Dung',
   groom: 'Quang Phong',
@@ -26,8 +30,8 @@ export const couple = {
 export const hero = {
   kicker: 'Cùng với gia đình hai bên',
   invite: 'trân trọng kính mời bạn đến chung vui',
-  image: img('1519741497674-611481863552', 2000),
-  imageAlt: 'Thùy Dung và Quang Phong trong ánh nắng vàng buổi chiều',
+  image: photo('DAT_8553.jpg'),
+  imageAlt: 'Thùy Dung và Quang Phong bên đài phun nước trong khu vườn',
   scrollHint: 'Bắt đầu câu chuyện',
 }
 
@@ -42,28 +46,28 @@ export const loveStory = {
       month: 'Tháng Tám',
       title: 'Gặp nhau nơi công sở',
       text: 'Tháng Tám năm ấy, chúng mình gặp nhau ở công ty — anh là chàng trai phòng Công nghệ, còn em là cô gái vừa về nhận vị trí Nhân sự. Một cuộc gặp tình cờ nơi làm việc đã mở ra câu chuyện của hai đứa.',
-      image: img('1529636798458-92182e662485', 1200),
+      image: photo('DAT_7062.jpg'),
     },
     {
       year: '2025',
       month: 'Tháng Mười Một',
       title: 'Tìm hiểu và thương nhau',
       text: 'Từ những lần chạm mặt nơi hành lang đến những câu chuyện chẳng đầu chẳng cuối, chúng mình dần thân quen, cùng nhau tìm hiểu và quyết định nắm tay bước vào một mối duyên.',
-      image: img('1511285560929-80b456fea0bc', 1200),
+      image: photo('DAT_7117.jpg'),
     },
     {
       year: '2026',
       month: 'Tháng Ba',
       title: 'Những chuyến đi cùng nhau',
       text: 'Hải Phòng, Ninh Bình, Thanh Hóa… mỗi chuyến đi là một mảnh ghép kỷ niệm. Cùng nhau rong ruổi, chúng mình nhận ra: đi đâu cũng được, miễn là có nhau.',
-      image: img('1469371670807-013ccf25f16a', 1200),
+      image: photo('DAT_8305.jpg'),
     },
     {
       year: '2026',
       month: 'Tháng Sáu',
       title: 'Về chung một nhà',
       text: 'Sau những tháng ngày đồng hành, chúng mình quyết định viết tiếp câu chuyện dưới một mái nhà — và hẹn nhau ở chương đẹp nhất: ngày cưới.',
-      image: img('1522673607200-164d1b6ce486', 1200),
+      image: photo('DAT_9307.jpg'),
     },
   ],
 }
@@ -139,14 +143,18 @@ export const gallery = {
   title: 'Lưu giữ trong ánh sáng',
   intro: 'Đôi ba khung hình từ những chương đời đã đưa chúng mình đến bên nhau.',
   images: [
-    { src: img('1583939003579-730e3918a45a', 1100), alt: 'Cặp đôi nắm tay nhau dạo bước', span: 'tall' },
-    { src: img('1606800052052-a08af7148866', 1100), alt: 'Nhẫn cưới trên nền ren', span: 'short' },
-    { src: img('1519225421980-715cb0215aed', 1100), alt: 'Cô dâu trong ánh sáng dịu nhẹ', span: 'tall' },
-    { src: img('1525258946800-98cfd641d0de', 1100), alt: 'Bó hoa hồng vườn', span: 'short' },
-    { src: img('1537633552985-df8429e8048b', 1100), alt: 'Những bàn tay đan vào nhau', span: 'short' },
-    { src: img('1465495976277-4387d4b0b4c6', 1100), alt: 'Bàn tiệc ấm áp dưới ánh nến', span: 'tall' },
-    { src: img('1511285560929-80b456fea0bc', 1100), alt: 'Vòng tay ấm trong giờ vàng', span: 'short' },
-    { src: img('1494955870715-979ca4f13bf0', 1100), alt: 'Một điệu nhảy lặng lẽ', span: 'tall' },
+    { src: photo('DAT_6814.jpg'), alt: 'Cô dâu dịu dàng sau lớp voan cưới', span: 'tall' },
+    { src: photo('DAT_7352.jpg'), alt: 'Sánh đôi bên nhau, rạng rỡ nụ cười', span: 'tall' },
+    { src: photo('DAT_8756.jpg'), alt: 'Dạo bước giữa khu vườn mùa hạ', span: 'short' },
+    { src: photo('DAT_6948.jpg'), alt: 'Nắm tay nhau bước vào chương mới', span: 'tall' },
+    { src: photo('DAT_8253.jpg'), alt: 'Cô dâu và bó hoa trong nắng vườn', span: 'tall' },
+    { src: photo('DAT_7166.jpg'), alt: 'Tựa vào nhau, bình yên', span: 'tall' },
+    { src: photo('DAT_9493.jpg'), alt: 'Anh dẫn em qua lối vườn xanh', span: 'short' },
+    { src: photo('DAT_7448.jpg'), alt: 'Cô dâu bên những đóa tulip trắng', span: 'tall' },
+    { src: photo('DAT_8343.jpg'), alt: 'Kề má nhau, ánh mắt trao yêu thương', span: 'tall' },
+    { src: photo('DAT_8848.jpg'), alt: 'Ôm nhau dưới vòm hoa lãng mạn', span: 'tall' },
+    { src: photo('DAT_8975.jpg'), alt: 'Ngồi bên nhau trên thảm cỏ xanh', span: 'tall' },
+    { src: photo('DAT_9468.jpg'), alt: 'Nụ cười hạnh phúc trước cổng vòm', span: 'tall' },
   ],
 }
 

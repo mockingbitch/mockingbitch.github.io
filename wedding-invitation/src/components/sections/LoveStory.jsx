@@ -48,7 +48,7 @@ function Milestone({ data, index }) {
               src={data.image}
               alt={data.title}
               className="h-56 w-full sm:h-64"
-              imgClassName="transition-transform duration-[1.4s] ease-luxe group-hover:scale-110"
+              imgClassName="object-[50%_35%] transition-transform duration-[1.4s] ease-luxe group-hover:scale-110"
               rounded="rounded-none"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-charcoal/40 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
