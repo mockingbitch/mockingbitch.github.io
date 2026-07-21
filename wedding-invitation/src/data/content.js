@@ -178,17 +178,19 @@ export const gifts = {
     {
       side: 'Nhà Trai',
       name: 'Trần Quang Phong',
-      bank: 'Vietcombank',
-      account: '0123 456 789',
-      value: 'Mung cuoi Quang Phong | Vietcombank 0123456789',
+      bank: 'MB Bank',
+      account: '0374110298',
+      value:
+        '00020101021138540010A00000072701240006970422011003741102980208QRIBFTTA5204000053037045802VN62250821Mung cuoi Quang Phong6304116F',
       image: null,
     },
     {
       side: 'Nhà Gái',
       name: 'Nguyễn Thùy Dung',
-      bank: 'Techcombank',
-      account: '9876 543 210',
-      value: 'Mung cuoi Thuy Dung | Techcombank 9876543210',
+      bank: 'Vietcombank',
+      account: '1023882766',
+      value:
+        '00020101021138540010A00000072701240006970436011010238827660208QRIBFTTA5204000053037045802VN62230819Mung cuoi Thuy Dung63044D7B',
       image: null,
     },
   ],
