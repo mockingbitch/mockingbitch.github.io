@@ -21,7 +21,7 @@ export const couple = {
   // Ngày dùng cho đồng hồ đếm ngược + màn mở đầu (lấy buổi tiệc diễn ra trước).
   date: '2026-08-02T11:00:00',
   dateShort: '02 · 08 · 2026',
-  datesShort: '02 & 08 · 08 · 2026',
+  datesShort: '02 & 07 · 08 · 2026',
   year: '2026',
   city: 'Hà Nội & Thanh Hóa',
   tagline: 'Hai câu chuyện, hòa làm một.',
@@ -211,7 +211,7 @@ export const wishes = {
 export const footer = {
   message: 'Chúng mình rất mong được cùng bạn chung vui trong ngày trọng đại.',
   names: 'Quang Phong & Thùy Dung',
-  date: '02 & 08 · 08 · 2026',
+  date: '02 & 07 · 08 · 2026',
   credit: 'Thực hiện với tình yêu',
 }
 
