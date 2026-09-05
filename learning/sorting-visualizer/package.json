@@ -1,0 +1,12 @@
+{
+  "name": "sorting-visualizer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Trực quan hoá thuật toán sắp xếp bằng animation (HTML/CSS/JS thuần, không dependency)",
+  "scripts": {
+    "test": "node test/verify.mjs",
+    "build": "node build-standalone.mjs",
+    "serve": "python3 -m http.server 8080"
+  }
+}

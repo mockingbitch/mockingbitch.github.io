@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trực quan hoá thuật toán sắp xếp</title>
+  <meta name="description" content="Animation 9 thuật toán sắp xếp kèm mã giả, thuyết minh từng bước và bộ đếm thao tác. HTML/CSS/JS thuần.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <h1>Trực quan hoá thuật toán sắp xếp</h1>
+    <p class="lede">
+      9 thuật toán, chạy từng bước một, kèm mã giả được tô sáng theo đúng dòng đang thực thi
+      và lời thuyết minh cho mỗi thao tác. Bấm <kbd>Space</kbd> để chạy/dừng,
+      <kbd>←</kbd> <kbd>→</kbd> để đi từng bước.
+    </p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ------------------------------ Bảng điều khiển ------------------------------ -->
+  <section class="controls" aria-label="Bảng điều khiển">
+    <div class="control">
+      <label for="algo">Thuật toán</label>
+      <select id="algo"></select>
+    </div>
+
+    <div class="control">
+      <label for="dist">Dạng dữ liệu</label>
+      <select id="dist"></select>
+    </div>
+
+    <div class="control">
+      <label for="size">Số phần tử <output id="sizeOut">40</output></label>
+      <input type="range" id="size" min="5" max="120" step="1" value="40">
+    </div>
+
+    <div class="control">
+      <label for="speed">Tốc độ <output id="speedOut">12 bước/giây</output></label>
+      <input type="range" id="speed" min="0" max="100" step="1" value="45">
+    </div>
+
+    <div class="control buttons">
+      <button id="shuffle" class="btn" title="Sinh mảng mới (phím R)">🎲 Mảng mới</button>
+      <button id="toStart" class="btn icon" title="Về đầu">⏮</button>
+      <button id="prev" class="btn icon" title="Lùi một bước (←)">◀</button>
+      <button id="play" class="btn primary" title="Chạy / dừng (Space)">▶ Chạy</button>
+      <button id="next" class="btn icon" title="Tới một bước (→)">▶</button>
+      <button id="toEnd" class="btn icon" title="Tới cuối">⏭</button>
+      <button id="sound" class="btn icon" aria-pressed="false" title="Bật/tắt âm thanh">🔇</button>
+    </div>
+  </section>
+
+  <!-- ------------------------------ Sân khấu ------------------------------ -->
+  <section class="stage" aria-label="Khu vực hiển thị">
+    <canvas id="canvas" aria-label="Biểu đồ cột thể hiện mảng đang được sắp xếp" role="img"></canvas>
+
+    <div id="aux" class="aux" hidden>
+      <div class="aux-label"></div>
+      <div class="aux-cells"></div>
+    </div>
+
+    <div class="legend" id="legend"></div>
+
+    <div class="timeline">
+      <input type="range" id="scrub" min="0" max="0" value="0" step="1" aria-label="Thanh tua bước">
+      <div class="timeline-meta">
+        <span id="posOut">bước 0 / 0</span>
+      </div>
+    </div>
+
+    <p class="narration" id="narration">Bấm <strong>Chạy</strong> để bắt đầu.</p>
+
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <!-- ------------------------------ Mã giả + giải thích ------------------------------ -->
+  <section class="panels">
+    <article class="panel">
+      <h2>Mã giả <span class="panel-sub" id="algoName"></span></h2>
+      <ol class="pseudocode" id="pseudocode"></ol>
+      <p class="panel-foot">Dòng được tô sáng là dòng đang thực thi ở bước hiện tại.</p>
+    </article>
+
+    <article class="panel">
+      <h2>Cách hoạt động</h2>
+      <p class="idea" id="idea"></p>
+      <ol class="mechanism" id="mechanism"></ol>
+
+      <h3>Độ phức tạp</h3>
+      <table class="cx" id="complexity"></table>
+
+      <div class="two-col">
+        <div>
+          <h3>Điểm mạnh</h3>
+          <ul id="strengths"></ul>
+        </div>
+        <div>
+          <h3>Điểm yếu</h3>
+          <ul id="weaknesses"></ul>
+        </div>
+      </div>
+
+      <h3>Nhìn gì trên animation</h3>
+      <p class="watch" id="watch"></p>
+    </article>
+  </section>
+
+  <!-- ------------------------------ Bảng tổng hợp ------------------------------ -->
+  <section class="panel wide">
+    <h2>Bảng so sánh nhanh</h2>
+    <div class="table-scroll">
+      <table class="summary" id="summary"></table>
+    </div>
+    <p class="panel-foot" id="lowerBound"></p>
+  </section>
+
+  <!-- ------------------------------ Kiến trúc mã nguồn ------------------------------ -->
+  <section class="panel wide">
+    <h2>Trang này hoạt động thế nào</h2>
+    <p>
+      Điểm mấu chốt: <strong>thuật toán không vẽ gì cả</strong>. Mỗi thuật toán là một
+      <code>function*</code> (generator) — nó chạy đúng như trong sách, nhưng mỗi khi làm một việc
+      đáng kể thì <code>yield</code> ra một “bước” mô tả việc đó:
+    </p>
+<pre class="code-block"><code>yield compare(j, j + 1, 3, 'So sánh a[j] với a[j+1]');
+if (a[j] &gt; a[j + 1]) {
+  yield swap(j, j + 1, 4, 'Đổi chỗ');
+  [a[j], a[j + 1]] = [a[j + 1], a[j]];
+}</code></pre>
+    <p>
+      Chạy hết generator ta được một mảng các bước — coi như một <em>cuốn băng</em>. Từ đó mọi thứ
+      trở nên đơn giản: chạy = áp dụng bước kế tiếp; tua lui = dựng lại trạng thái từ mảng gốc rồi
+      áp dụng k bước đầu; kéo thanh trượt = nhảy tới vị trí bất kỳ. Không cần viết hàm “undo”,
+      cũng không cần lưu ảnh chụp trạng thái.
+    </p>
+    <ul class="files" id="files"></ul>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>
+      Mã nguồn thuần HTML/CSS/JS, không dependency, không bước build.
+      Kiểm chứng bằng <code>node test/verify.mjs</code> — mỗi thuật toán được chạy trên 6 dạng dữ liệu
+      × 8 kích thước, kiểm tra cả kết quả sắp xếp lẫn việc phát lại chuỗi bước cho ra đúng mảng đó.
+    </p>
+  </div>
+</footer>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

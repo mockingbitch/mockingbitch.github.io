@@ -1,0 +1,2271 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trực quan hoá thuật toán sắp xếp</title>
+  <meta name="description" content="Animation 9 thuật toán sắp xếp kèm mã giả, thuyết minh từng bước và bộ đếm thao tác. HTML/CSS/JS thuần.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+  <style>
+/* ==========================================================================
+   style.css — giao diện Sorting Visualizer
+   Bảng màu khai báo bằng biến CSS; renderer đọc lại chính các biến này qua
+   getComputedStyle nên canvas tự đổi màu theo chế độ sáng/tối.
+   ========================================================================== */
+
+:root {
+  --bg: #f7f8fa;
+  --panel: #ffffff;
+  --panel-2: #f2f4f8;
+  --border: #e2e6ee;
+  --text: #1c2331;
+  --label: #333c4d;
+  --muted: #6b7488;
+  --accent: #2a6df4;
+  --accent-soft: #e8f0ff;
+
+  /* màu dùng chung cho canvas + chú giải */
+  --bar: #94a3c4;
+  --bar-compare: #f5a524;
+  --bar-swap: #e5484d;
+  --bar-sorted: #2fa36b;
+  --bar-pivot: #8e4ec6;
+  --hold: #0091ff;
+  --range-bg: rgba(42, 109, 244, .09);
+
+  --radius: 12px;
+  --shadow: 0 1px 2px rgba(16, 24, 40, .05), 0 8px 24px rgba(16, 24, 40, .06);
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e1117;
+    --panel: #161b23;
+    --panel-2: #1c222c;
+    --border: #262d38;
+    --text: #e6eaf2;
+    --label: #c3cad8;
+    --muted: #8a93a6;
+    --accent: #5b93ff;
+    --accent-soft: #16233c;
+
+    --bar: #5f6d8c;
+    --bar-compare: #f2b544;
+    --bar-swap: #ff6369;
+    --bar-sorted: #3dd68c;
+    --bar-pivot: #b18aff;
+    --hold: #4aa8ff;
+    --range-bg: rgba(91, 147, 255, .12);
+
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+
+/* ------------------------------- header ------------------------------- */
+
+.site-header { padding: 34px 0 22px; }
+.site-header h1 { margin: 0 0 8px; font-size: clamp(22px, 3.4vw, 32px); letter-spacing: -.02em; }
+.lede { margin: 0; color: var(--muted); max-width: 68ch; }
+
+kbd {
+  font: 600 12px/1 var(--mono);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  padding: 2px 5px;
+  color: var(--label);
+}
+
+/* ------------------------------ controls ------------------------------ */
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px 18px;
+  align-items: end;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px 18px;
+}
+
+/* tên thuật toán dài nhất nên cột đầu được rộng hơn */
+@media (min-width: 860px) {
+  .controls { grid-template-columns: 1.6fr 1.1fr 1fr 1fr; }
+}
+
+.control { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.control label { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: .02em; }
+.control output { color: var(--accent); font-family: var(--mono); font-size: 11px; }
+.control.buttons { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; gap: 8px; }
+
+select, input[type="range"] { width: 100%; }
+
+select {
+  appearance: none;
+  background: var(--panel-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7488' d='M2 4.5 6 9l4-4.5z'/%3E%3C/svg%3E") no-repeat right 10px center;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  padding: 9px 30px 9px 11px;
+}
+
+input[type="range"] {
+  appearance: none;
+  height: 24px;
+  background: transparent;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track { height: 5px; border-radius: 99px; background: var(--border); }
+input[type="range"]::-moz-range-track { height: 5px; border-radius: 99px; background: var(--border); }
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none; width: 16px; height: 16px; margin-top: -5.5px;
+  border-radius: 50%; background: var(--accent); border: 2px solid var(--panel);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 14px; height: 14px; border-radius: 50%; background: var(--accent); border: 2px solid var(--panel);
+}
+select:focus-visible, input:focus-visible, button:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+
+.btn {
+  font: inherit; font-size: 14px; font-weight: 500;
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 9px 14px;
+  cursor: pointer;
+  transition: background .12s, border-color .12s, transform .06s;
+}
+.btn:hover { background: var(--accent-soft); border-color: var(--accent); }
+.btn:active { transform: translateY(1px); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; min-width: 108px; }
+.btn.primary:hover { filter: brightness(1.07); }
+.btn.icon { padding: 9px 12px; font-family: var(--mono); }
+.btn[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+
+/* -------------------------------- stage -------------------------------- */
+
+.stage {
+  margin-top: 18px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px 18px 18px;
+}
+
+#canvas {
+  display: block;
+  width: 100%;
+  height: 340px;
+  border-radius: 8px;
+  background: transparent;
+}
+
+/* dải mảng phụ (counting / radix sort) */
+.aux { margin-top: 10px; border-top: 1px dashed var(--border); padding-top: 10px; }
+.aux-label { font: 600 11px/1.4 var(--mono); color: var(--muted); margin-bottom: 6px; }
+.aux-cells { display: flex; flex-wrap: wrap; gap: 3px; }
+.aux-cell {
+  min-width: 24px; text-align: center;
+  font: 600 11px/1 var(--mono);
+  padding: 5px 3px;
+  border-radius: 5px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--label);
+}
+.aux-cell .idx { display: block; font-size: 9px; font-weight: 400; color: var(--muted); }
+.aux-cell.on { background: var(--bar-compare); border-color: var(--bar-compare); color: #1c2331; }
+.aux-cell.on .idx { color: #1c2331; opacity: .75; }
+
+/* chú giải màu */
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 12px; font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+
+/* thanh tua */
+.timeline { margin-top: 12px; }
+.timeline-meta { display: flex; justify-content: flex-end; font: 500 11px/1 var(--mono); color: var(--muted); }
+
+.narration {
+  margin: 12px 0 0;
+  min-height: 46px;
+  background: var(--panel-2);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--label);
+}
+
+.stats { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.stat {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 11px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.stat b { display: block; font: 700 16px/1.3 var(--mono); color: var(--text); }
+
+/* -------------------------------- panels -------------------------------- */
+
+.panels { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 18px; margin-top: 18px; }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px 20px 20px;
+}
+.panel.wide { margin-top: 18px; }
+.panel h2 { margin: 0 0 12px; font-size: 16px; letter-spacing: -.01em; }
+.panel h3 { margin: 18px 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.panel-sub { font-weight: 400; color: var(--muted); font-size: 13px; }
+.panel-foot { margin: 14px 0 0; font-size: 12px; color: var(--muted); }
+.panel ul, .panel ol { margin: 0; padding-left: 20px; }
+.panel li { margin: 5px 0; }
+
+/* mã giả */
+.pseudocode {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font: 13px/1.75 var(--mono);
+  counter-reset: ln;
+  overflow-x: auto;
+}
+.pseudocode li {
+  counter-increment: ln;
+  margin: 0;
+  padding: 1px 10px 1px 42px;
+  position: relative;
+  white-space: pre;
+  border-radius: 6px;
+  color: var(--label);
+  transition: background .15s;
+}
+.pseudocode li::before {
+  content: counter(ln);
+  position: absolute; left: 0; width: 30px;
+  text-align: right;
+  color: var(--muted); opacity: .55;
+}
+.pseudocode li.active { background: var(--accent-soft); color: var(--text); font-weight: 600; box-shadow: inset 2px 0 0 var(--accent); }
+.pseudocode li.comment { color: var(--muted); }
+
+.idea { margin: 0 0 4px; }
+.mechanism li { margin: 7px 0; }
+.watch { margin: 0; color: var(--label); }
+
+code {
+  font: 12.5px/1.4 var(--mono);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 1px 5px;
+}
+
+.code-block {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  overflow-x: auto;
+  font: 13px/1.7 var(--mono);
+}
+.code-block code { background: none; border: 0; padding: 0; font-size: inherit; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+
+/* bảng */
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-weight: 600; font-size: 12px; }
+.cx td:first-child { color: var(--muted); width: 42%; }
+.cx td:last-child { font-family: var(--mono); font-weight: 600; }
+
+.table-scroll { overflow-x: auto; }
+.summary { min-width: 720px; }
+.summary tbody tr.current { background: var(--accent-soft); }
+.summary td:first-child { font-weight: 600; white-space: nowrap; }
+.summary .mono { font-family: var(--mono); font-size: 12px; }
+
+.yes { color: var(--bar-sorted); font-weight: 600; }
+.no  { color: var(--bar-swap); font-weight: 600; }
+
+.files { font-size: 13px; }
+.files code { font-weight: 600; }
+
+/* ------------------------------- footer ------------------------------- */
+
+.site-footer { margin: 28px 0 40px; }
+.site-footer p { color: var(--muted); font-size: 13px; margin: 0; }
+
+/* ----------------------------- responsive ----------------------------- */
+
+@media (max-width: 900px) {
+  .panels { grid-template-columns: 1fr; }
+  #canvas { height: 260px; }
+  .two-col { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <h1>Trực quan hoá thuật toán sắp xếp</h1>
+    <p class="lede">
+      9 thuật toán, chạy từng bước một, kèm mã giả được tô sáng theo đúng dòng đang thực thi
+      và lời thuyết minh cho mỗi thao tác. Bấm <kbd>Space</kbd> để chạy/dừng,
+      <kbd>←</kbd> <kbd>→</kbd> để đi từng bước.
+    </p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ------------------------------ Bảng điều khiển ------------------------------ -->
+  <section class="controls" aria-label="Bảng điều khiển">
+    <div class="control">
+      <label for="algo">Thuật toán</label>
+      <select id="algo"></select>
+    </div>
+
+    <div class="control">
+      <label for="dist">Dạng dữ liệu</label>
+      <select id="dist"></select>
+    </div>
+
+    <div class="control">
+      <label for="size">Số phần tử <output id="sizeOut">40</output></label>
+      <input type="range" id="size" min="5" max="120" step="1" value="40">
+    </div>
+
+    <div class="control">
+      <label for="speed">Tốc độ <output id="speedOut">12 bước/giây</output></label>
+      <input type="range" id="speed" min="0" max="100" step="1" value="45">
+    </div>
+
+    <div class="control buttons">
+      <button id="shuffle" class="btn" title="Sinh mảng mới (phím R)">🎲 Mảng mới</button>
+      <button id="toStart" class="btn icon" title="Về đầu">⏮</button>
+      <button id="prev" class="btn icon" title="Lùi một bước (←)">◀</button>
+      <button id="play" class="btn primary" title="Chạy / dừng (Space)">▶ Chạy</button>
+      <button id="next" class="btn icon" title="Tới một bước (→)">▶</button>
+      <button id="toEnd" class="btn icon" title="Tới cuối">⏭</button>
+      <button id="sound" class="btn icon" aria-pressed="false" title="Bật/tắt âm thanh">🔇</button>
+    </div>
+  </section>
+
+  <!-- ------------------------------ Sân khấu ------------------------------ -->
+  <section class="stage" aria-label="Khu vực hiển thị">
+    <canvas id="canvas" aria-label="Biểu đồ cột thể hiện mảng đang được sắp xếp" role="img"></canvas>
+
+    <div id="aux" class="aux" hidden>
+      <div class="aux-label"></div>
+      <div class="aux-cells"></div>
+    </div>
+
+    <div class="legend" id="legend"></div>
+
+    <div class="timeline">
+      <input type="range" id="scrub" min="0" max="0" value="0" step="1" aria-label="Thanh tua bước">
+      <div class="timeline-meta">
+        <span id="posOut">bước 0 / 0</span>
+      </div>
+    </div>
+
+    <p class="narration" id="narration">Bấm <strong>Chạy</strong> để bắt đầu.</p>
+
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <!-- ------------------------------ Mã giả + giải thích ------------------------------ -->
+  <section class="panels">
+    <article class="panel">
+      <h2>Mã giả <span class="panel-sub" id="algoName"></span></h2>
+      <ol class="pseudocode" id="pseudocode"></ol>
+      <p class="panel-foot">Dòng được tô sáng là dòng đang thực thi ở bước hiện tại.</p>
+    </article>
+
+    <article class="panel">
+      <h2>Cách hoạt động</h2>
+      <p class="idea" id="idea"></p>
+      <ol class="mechanism" id="mechanism"></ol>
+
+      <h3>Độ phức tạp</h3>
+      <table class="cx" id="complexity"></table>
+
+      <div class="two-col">
+        <div>
+          <h3>Điểm mạnh</h3>
+          <ul id="strengths"></ul>
+        </div>
+        <div>
+          <h3>Điểm yếu</h3>
+          <ul id="weaknesses"></ul>
+        </div>
+      </div>
+
+      <h3>Nhìn gì trên animation</h3>
+      <p class="watch" id="watch"></p>
+    </article>
+  </section>
+
+  <!-- ------------------------------ Bảng tổng hợp ------------------------------ -->
+  <section class="panel wide">
+    <h2>Bảng so sánh nhanh</h2>
+    <div class="table-scroll">
+      <table class="summary" id="summary"></table>
+    </div>
+    <p class="panel-foot" id="lowerBound"></p>
+  </section>
+
+  <!-- ------------------------------ Kiến trúc mã nguồn ------------------------------ -->
+  <section class="panel wide">
+    <h2>Trang này hoạt động thế nào</h2>
+    <p>
+      Điểm mấu chốt: <strong>thuật toán không vẽ gì cả</strong>. Mỗi thuật toán là một
+      <code>function*</code> (generator) — nó chạy đúng như trong sách, nhưng mỗi khi làm một việc
+      đáng kể thì <code>yield</code> ra một “bước” mô tả việc đó:
+    </p>
+<pre class="code-block"><code>yield compare(j, j + 1, 3, 'So sánh a[j] với a[j+1]');
+if (a[j] &gt; a[j + 1]) {
+  yield swap(j, j + 1, 4, 'Đổi chỗ');
+  [a[j], a[j + 1]] = [a[j + 1], a[j]];
+}</code></pre>
+    <p>
+      Chạy hết generator ta được một mảng các bước — coi như một <em>cuốn băng</em>. Từ đó mọi thứ
+      trở nên đơn giản: chạy = áp dụng bước kế tiếp; tua lui = dựng lại trạng thái từ mảng gốc rồi
+      áp dụng k bước đầu; kéo thanh trượt = nhảy tới vị trí bất kỳ. Không cần viết hàm “undo”,
+      cũng không cần lưu ảnh chụp trạng thái.
+    </p>
+    <ul class="files" id="files"></ul>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>
+      Mã nguồn thuần HTML/CSS/JS, không dependency, không bước build.
+      Kiểm chứng bằng <code>node test/verify.mjs</code> — mỗi thuật toán được chạy trên 6 dạng dữ liệu
+      × 8 kích thước, kiểm tra cả kết quả sắp xếp lẫn việc phát lại chuỗi bước cho ra đúng mảng đó.
+    </p>
+  </div>
+</footer>
+
+<script type="module">
+/* ==== js/steps.js ==== */
+/**
+ * steps.js — "Ngôn ngữ chung" giữa thuật toán và phần hiển thị.
+ *
+ * Ý tưởng cốt lõi của cả project:
+ *
+ *   Thuật toán KHÔNG vẽ gì cả. Nó chỉ *kể lại* những gì nó làm, dưới dạng
+ *   một chuỗi "bước" (step) rất nhỏ và rất cụ thể: "tôi so sánh a[3] với
+ *   a[4]", "tôi đổi chỗ a[3] và a[4]", "tôi ghi 42 vào a[7]"...
+ *
+ *   Phần hiển thị đọc chuỗi bước đó và vẽ lại. Nhờ tách đôi như vậy:
+ *     - Thuật toán viết y hệt sách giáo khoa, không dính DOM/Canvas.
+ *     - Tua tới / tua lui / chạy chậm / chạy nhanh chỉ là việc phát lại
+ *       cùng một chuỗi bước ở tốc độ khác nhau.
+ *     - Muốn thêm thuật toán mới: viết thêm 1 generator, không sửa UI.
+ *
+ * Một bước là object thuần:
+ *   { op, ...tham số, line, text, marks }
+ *     op    : loại thao tác (xem bảng bên dưới)
+ *     line  : dòng mã giả đang được thực thi (để tô sáng pseudocode)
+ *     text  : lời thuyết minh tiếng Việt cho bước này
+ *     marks : con trỏ phụ để vẽ nhãn (i, j, min, mid, hold, ...)
+ *
+ * Bảng thao tác:
+ *   compare(i, j)      chỉ đọc, không đổi mảng   → đếm số phép so sánh
+ *   swap(i, j)         đổi chỗ hai phần tử
+ *   write(i, value)    ghi đè một ô (chèn / trộn / chép về)
+ *   sorted(from, to)   đánh dấu đoạn đã đúng thứ tự (tô xanh, cộng dồn)
+ *   range(from, to)    đoạn đang được xử lý (nền mờ); null = xoá
+ *   pivot(i)           vị trí phần tử chốt; null = xoá
+ *   aux(payload)       mảng phụ (counting/radix sort) để vẽ dải bên dưới
+ *   note()             không đổi trạng thái, chỉ để giải thích một nhịp
+ */
+
+const compare = (i, j, line, text, marks = null) => ({ op: 'compare', i, j, line, text, marks });
+const swap    = (i, j, line, text, marks = null) => ({ op: 'swap', i, j, line, text, marks });
+const write   = (i, value, line, text, marks = null) => ({ op: 'write', i, value, line, text, marks });
+const sorted  = (from, to, line, text, marks = null) => ({ op: 'sorted', from, to, line, text, marks });
+const range   = (from, to, line, text, marks = null) => ({ op: 'range', from, to, line, text, marks });
+const pivot   = (i, line, text, marks = null) => ({ op: 'pivot', i, line, text, marks });
+const aux     = (payload, line, text, marks = null) => ({ op: 'aux', aux: payload, line, text, marks });
+const note    = (line, text, marks = null) => ({ op: 'note', line, text, marks });
+
+/** Trạng thái đầy đủ của màn hình tại một thời điểm phát lại. */
+function createState(initial) {
+  return {
+    array: initial.slice(),
+    sorted: new Set(),   // các chỉ số đã nằm trong đoạn có thứ tự
+    range: null,         // [from, to] đoạn đang xử lý
+    pivot: null,         // chỉ số phần tử chốt
+    aux: null,           // { label, values, highlight }
+    marks: null,         // con trỏ phụ của bước hiện tại
+    line: -1,            // dòng mã giả đang sáng
+    text: '',            // lời thuyết minh
+    step: null,          // chính bước vừa áp dụng (renderer cần biết op)
+    stats: { comparisons: 0, swaps: 0, writes: 0, reads: 0 },
+  };
+}
+
+/**
+ * Áp dụng đúng MỘT bước lên trạng thái. Đây là "máy ảo" của visualizer:
+ * tua tới = gọi thêm một lần; tua lui = dựng lại từ đầu rồi gọi k lần
+ * (rất rẻ, vì mỗi bước chỉ là vài phép gán).
+ */
+function applyStep(state, step) {
+  const a = state.array;
+  const st = state.stats;
+
+  switch (step.op) {
+    case 'compare':
+      st.comparisons++;
+      st.reads += 2;
+      break;
+
+    case 'swap': {
+      const t = a[step.i];
+      a[step.i] = a[step.j];
+      a[step.j] = t;
+      st.swaps++;
+      st.writes += 2;
+      st.reads += 2;
+      break;
+    }
+
+    case 'write':
+      a[step.i] = step.value;
+      st.writes++;
+      break;
+
+    case 'sorted':
+      for (let k = step.from; k <= step.to; k++) state.sorted.add(k);
+      break;
+
+    case 'range':
+      state.range = step.from == null ? null : [step.from, step.to];
+      break;
+
+    case 'pivot':
+      state.pivot = step.i;
+      break;
+
+    case 'aux':
+      state.aux = step.aux;
+      break;
+
+    case 'note':
+    default:
+      break;
+  }
+
+  state.marks = step.marks || null;
+  state.line = step.line ?? -1;
+  state.text = step.text || '';
+  state.step = step;
+}
+
+/** Dựng lại trạng thái sau khi đã áp dụng `count` bước đầu tiên. */
+function replay(initial, steps, count) {
+  const state = createState(initial);
+  const n = Math.max(0, Math.min(count, steps.length));
+  for (let k = 0; k < n; k++) applyStep(state, steps[k]);
+  return state;
+}
+
+/* ==== js/algorithms.js ==== */
+/**
+ * algorithms.js — 9 thuật toán sắp xếp, mỗi cái là một GENERATOR.
+ *
+ * Quy ước:
+ *   - `run(a)` nhận BẢN SAO của mảng và được phép sửa trực tiếp lên nó.
+ *   - Mỗi khi làm một việc đáng kể, nó `yield` ra một bước (xem steps.js).
+ *   - Thứ tự bắt buộc: `yield` bước MÔ TẢ trước, rồi mới thực sự sửa mảng.
+ *     Lý do: lời thuyết minh trong bước phải đọc được giá trị *trước* khi
+ *     thay đổi, còn phần phát lại sẽ tự áp dụng thay đổi khi tới bước đó.
+ *   - `pseudocode` là mảng dòng; `line` trong mỗi bước là chỉ số dòng đó.
+ *
+ * Nhờ generator, thuật toán "tạm dừng" được ở giữa vòng lặp mà không cần
+ * viết lại thành máy trạng thái — đây là lý do chính chọn generator thay
+ * vì setTimeout lồng nhau hay callback.
+ */
+
+
+/* ------------------------------------------------------------------ *
+ * 1. Bubble Sort — nổi bọt
+ * ------------------------------------------------------------------ */
+
+const BUBBLE_CODE = [
+  'for i ← 0 … n-2:',
+  '    swapped ← false',
+  '    for j ← 0 … n-2-i:',
+  '        if a[j] > a[j+1]:',
+  '            swap(a[j], a[j+1]); swapped ← true',
+  '    // phần tử lớn nhất đã "nổi" về cuối đoạn',
+  '    a[n-1-i] đã đúng vị trí',
+  '    if not swapped: break    // dừng sớm khi đã xong',
+  'hoàn tất',
+];
+
+function* bubbleSort(a) {
+  const n = a.length;
+  if (n < 2) { yield sorted(0, n - 1, 8, 'Mảng có ≤ 1 phần tử nên đã sắp xếp.'); return; }
+
+  for (let i = 0; i < n - 1; i++) {
+    let swapped = false;
+    yield note(1, `Lượt quét ${i + 1}: đặt cờ swapped = false.`, { i });
+
+    for (let j = 0; j < n - 1 - i; j++) {
+      yield compare(j, j + 1, 3, `So sánh a[${j}] = ${a[j]} với a[${j + 1}] = ${a[j + 1]}.`, { j });
+      if (a[j] > a[j + 1]) {
+        yield swap(j, j + 1, 4, `${a[j]} > ${a[j + 1]} → đổi chỗ, phần tử lớn hơn trôi sang phải.`, { j });
+        const t = a[j]; a[j] = a[j + 1]; a[j + 1] = t;
+        swapped = true;
+      }
+    }
+
+    yield sorted(n - 1 - i, n - 1 - i, 6,
+      `Hết lượt: phần tử lớn nhất của đoạn đã nổi tới a[${n - 1 - i}] = ${a[n - 1 - i]} → chốt vị trí.`);
+
+    if (!swapped) {
+      yield sorted(0, n - 1, 7, 'Cả lượt không đổi chỗ lần nào → mảng đã có thứ tự, dừng sớm.');
+      return;
+    }
+  }
+  yield sorted(0, n - 1, 8, 'Hoàn tất.');
+}
+
+/* ------------------------------------------------------------------ *
+ * 2. Selection Sort — chọn trực tiếp
+ * ------------------------------------------------------------------ */
+
+const SELECTION_CODE = [
+  'for i ← 0 … n-2:',
+  '    min ← i                       // ứng viên nhỏ nhất',
+  '    for j ← i+1 … n-1:',
+  '        if a[j] < a[min]: min ← j',
+  '    if min ≠ i: swap(a[i], a[min])',
+  '    a[i] đã đúng vị trí',
+  'hoàn tất',
+];
+
+function* selectionSort(a) {
+  const n = a.length;
+
+  for (let i = 0; i < n - 1; i++) {
+    let min = i;
+    yield range(i, n - 1, 1,
+      `Tìm phần tử nhỏ nhất trong đoạn chưa sắp xếp a[${i}..${n - 1}]; tạm coi a[${i}] = ${a[i]} là nhỏ nhất.`,
+      { i, min });
+
+    for (let j = i + 1; j < n; j++) {
+      yield compare(j, min, 3, `So sánh a[${j}] = ${a[j]} với ứng viên a[${min}] = ${a[min]}.`, { i, j, min });
+      if (a[j] < a[min]) {
+        min = j;
+        yield note(3, `a[${j}] = ${a[j]} nhỏ hơn → ứng viên nhỏ nhất mới là chỉ số ${j}.`, { i, j, min });
+      }
+    }
+
+    if (min !== i) {
+      yield swap(i, min, 4, `Đưa phần tử nhỏ nhất ${a[min]} về đầu đoạn chưa sắp xếp (vị trí ${i}).`, { i, min });
+      const t = a[i]; a[i] = a[min]; a[min] = t;
+    } else {
+      yield note(4, `a[${i}] vốn đã là nhỏ nhất → không cần đổi chỗ (tiết kiệm 1 lần ghi).`, { i, min });
+    }
+    yield sorted(i, i, 5, `a[${i}] = ${a[i]} chốt vị trí vĩnh viễn.`);
+  }
+  yield range(null, null, 6, 'Hoàn tất.');
+  yield sorted(0, n - 1, 6, 'Hoàn tất: phần tử cuối cùng hiển nhiên đã đúng chỗ.');
+}
+
+/* ------------------------------------------------------------------ *
+ * 3. Insertion Sort — chèn (giống xếp bài trên tay)
+ * ------------------------------------------------------------------ */
+
+const INSERTION_CODE = [
+  '// a[0] coi như đoạn đã sắp xếp',
+  'for i ← 1 … n-1:',
+  '    key ← a[i]                    // rút "quân bài" ra',
+  '    j ← i - 1',
+  '    while j ≥ 0 and a[j] > key:',
+  '        a[j+1] ← a[j]        // dịch phải, tạo chỗ trống',
+  '        j ← j - 1',
+  '    a[j+1] ← key            // đặt quân bài vào đó',
+  'hoàn tất',
+];
+
+function* insertionSort(a) {
+  const n = a.length;
+  yield sorted(0, 0, 0, 'Một phần tử thì luôn có thứ tự → coi a[0] là đoạn đã sắp xếp.');
+
+  for (let i = 1; i < n; i++) {
+    const key = a[i];
+    let j = i - 1;
+    yield note(2, `Rút a[${i}] = ${key} ra làm "quân bài" cần chèn vào đoạn a[0..${i - 1}].`,
+      { i, hold: { value: key, at: i } });
+
+    while (j >= 0) {
+      yield compare(j, j, 4, `So sánh a[${j}] = ${a[j]} với key = ${key}.`,
+        { i, j, hold: { value: key, at: j + 1 } });
+      if (a[j] <= key) {
+        yield note(4, `a[${j}] = ${a[j]} ≤ key → dừng, đã tìm được chỗ chèn.`,
+          { i, j, hold: { value: key, at: j + 1 } });
+        break;
+      }
+      yield write(j + 1, a[j], 5, `a[${j}] = ${a[j]} > key → dịch nó sang phải một ô.`,
+        { i, j, hold: { value: key, at: j } });
+      a[j + 1] = a[j];
+      j--;
+    }
+
+    yield write(j + 1, key, 7, `Đặt key = ${key} vào ô trống ở vị trí ${j + 1}.`, { i, hold: { value: key, at: j + 1 } });
+    a[j + 1] = key;
+    yield sorted(0, i, 7, `Đoạn a[0..${i}] giờ đã có thứ tự.`);
+  }
+  yield sorted(0, n - 1, 8, 'Hoàn tất.');
+}
+
+/* ------------------------------------------------------------------ *
+ * 4. Shell Sort — insertion sort theo bước nhảy giảm dần
+ * ------------------------------------------------------------------ */
+
+const SHELL_CODE = [
+  'gap ← n / 2',
+  'while gap > 0:',
+  '    for i ← gap … n-1:        // các dãy cách nhau gap ô',
+  '        temp ← a[i];  j ← i',
+  '        while j ≥ gap and a[j-gap] > temp:',
+  '            a[j] ← a[j-gap];  j ← j - gap',
+  '        a[j] ← temp',
+  '    gap ← gap / 2                 // thu nhỏ bước nhảy',
+  'hoàn tất  // lượt gap = 1 chỉ còn chỉnh vài chỗ nhỏ',
+];
+
+function* shellSort(a) {
+  const n = a.length;
+
+  for (let gap = Math.floor(n / 2); gap > 0; gap = Math.floor(gap / 2)) {
+    yield note(1, `Bước nhảy gap = ${gap}: sắp xếp các dãy con gồm những phần tử cách nhau ${gap} ô.`, { gap });
+
+    for (let i = gap; i < n; i++) {
+      const temp = a[i];
+      let j = i;
+      yield note(3, `Lấy temp = a[${i}] = ${temp}, so ngược lại theo bước nhảy ${gap}.`,
+        { i, gap, hold: { value: temp, at: i } });
+
+      while (j >= gap) {
+        yield compare(j - gap, j, 4, `So sánh a[${j - gap}] = ${a[j - gap]} với temp = ${temp}.`,
+          { i, j, gap, hold: { value: temp, at: j } });
+        if (a[j - gap] <= temp) break;
+        yield write(j, a[j - gap], 5, `a[${j - gap}] > temp → nhảy nó lên ${gap} ô, tới vị trí ${j}.`,
+          { i, j, gap, hold: { value: temp, at: j - gap } });
+        a[j] = a[j - gap];
+        j -= gap;
+      }
+
+      yield write(j, temp, 6, `Đặt temp = ${temp} vào vị trí ${j}.`, { i, j, gap });
+      a[j] = temp;
+    }
+    yield note(7, `Xong gap = ${gap}. Mảng đã "gần đúng thứ tự" hơn → lượt sau ít việc hơn hẳn.`, { gap });
+  }
+  yield sorted(0, n - 1, 8, 'Hoàn tất: lượt cuối gap = 1 chỉ còn phải chỉnh vài chỗ nhỏ.');
+}
+
+/* ------------------------------------------------------------------ *
+ * 5. Merge Sort — chia để trị, trộn hai nửa đã sắp xếp
+ * ------------------------------------------------------------------ */
+
+const MERGE_CODE = [
+  'mergeSort(lo, hi):',
+  '    if lo ≥ hi: return        // đoạn ≤ 1 đã có thứ tự',
+  '    mid ← (lo + hi) / 2',
+  '    mergeSort(lo, mid)            // sắp xếp nửa trái',
+  '    mergeSort(mid+1, hi)          // sắp xếp nửa phải',
+  '    merge(lo, mid, hi):',
+  '        i ← lo;  j ← mid+1;  tmp ← []',
+  '        while i ≤ mid and j ≤ hi:',
+  '            tmp += (a[i] ≤ a[j] ? a[i++] : a[j++])',
+  '        nối phần còn lại của nửa chưa hết vào tmp',
+  '        chép tmp trở lại a[lo..hi]',
+];
+
+function* mergeSort(a) {
+  yield* msort(a, 0, a.length - 1);
+  yield range(null, null, 10, 'Hoàn tất.');
+  yield sorted(0, a.length - 1, 10, 'Hoàn tất: hai nửa cuối cùng đã được trộn thành một mảng có thứ tự.');
+}
+
+function* msort(a, lo, hi) {
+  if (lo > hi) return;
+  yield range(lo, hi, 0, `Gọi mergeSort trên đoạn a[${lo}..${hi}].`, { lo, hi });
+  if (lo === hi) {
+    yield note(1, `Đoạn a[${lo}..${hi}] chỉ có 1 phần tử → hiển nhiên đã có thứ tự, quay lui.`, { lo, hi });
+    return;
+  }
+  const mid = (lo + hi) >> 1;
+  yield note(2, `Chia đôi tại mid = ${mid}: nửa trái a[${lo}..${mid}], nửa phải a[${mid + 1}..${hi}].`, { lo, hi, mid });
+  yield* msort(a, lo, mid);
+  yield* msort(a, mid + 1, hi);
+  yield* mergeRanges(a, lo, mid, hi);
+}
+
+function* mergeRanges(a, lo, mid, hi) {
+  yield range(lo, hi, 5, `Trộn hai đoạn đã có thứ tự: a[${lo}..${mid}] và a[${mid + 1}..${hi}].`, { lo, hi, mid });
+
+  const tmp = [];
+  let i = lo, j = mid + 1;
+
+  while (i <= mid && j <= hi) {
+    yield compare(i, j, 8, `So sánh a[${i}] = ${a[i]} với a[${j}] = ${a[j]} → lấy phần tử nhỏ hơn ra trước.`, { i, j, mid });
+    if (a[i] <= a[j]) { tmp.push(a[i]); i++; } else { tmp.push(a[j]); j++; }
+  }
+  while (i <= mid) {
+    yield note(9, `Nửa phải đã hết → lấy nốt a[${i}] = ${a[i]} từ nửa trái.`, { i, mid });
+    tmp.push(a[i]); i++;
+  }
+  while (j <= hi) {
+    yield note(9, `Nửa trái đã hết → lấy nốt a[${j}] = ${a[j]} từ nửa phải.`, { j, mid });
+    tmp.push(a[j]); j++;
+  }
+
+  for (let k = 0; k < tmp.length; k++) {
+    yield write(lo + k, tmp[k], 10, `Chép ${tmp[k]} từ mảng tạm về a[${lo + k}].`, { i: lo + k });
+    a[lo + k] = tmp[k];
+  }
+  yield note(10, `Đoạn a[${lo}..${hi}] đã có thứ tự.`, { lo, hi });
+}
+
+/* ------------------------------------------------------------------ *
+ * 6. Quick Sort — phân hoạch Lomuto quanh phần tử chốt
+ * ------------------------------------------------------------------ */
+
+const QUICK_CODE = [
+  'quickSort(lo, hi):',
+  '    if lo ≥ hi: return',
+  '    p ← partition(lo, hi)     // chốt về đúng chỗ',
+  '    quickSort(lo, p-1)            // vùng nhỏ hơn chốt',
+  '    quickSort(p+1, hi)        // vùng lớn hơn chốt',
+  '',
+  'partition(lo, hi):                // sơ đồ Lomuto',
+  '    pivot ← a[hi];  i ← lo - 1',
+  '    for j ← lo … hi-1:',
+  '        if a[j] ≤ pivot: i ← i+1; swap(a[i], a[j])',
+  '    swap(a[i+1], a[hi]);  return i+1',
+];
+
+function* quickSort(a) {
+  yield* qsort(a, 0, a.length - 1);
+  yield range(null, null, 10, 'Hoàn tất.');
+  yield sorted(0, a.length - 1, 10, 'Hoàn tất: mọi phần tử chốt đều đã về đúng chỗ.');
+}
+
+function* qsort(a, lo, hi) {
+  if (lo > hi) return;
+  if (lo === hi) {
+    yield sorted(lo, lo, 1, `Đoạn a[${lo}..${hi}] chỉ có 1 phần tử → đã đúng chỗ.`);
+    return;
+  }
+  yield range(lo, hi, 0, `quickSort trên đoạn a[${lo}..${hi}].`, { lo, hi });
+  const p = yield* partitionLomuto(a, lo, hi);
+  yield sorted(p, p, 2, `Chốt ${a[p]} đã nằm đúng vị trí cuối cùng là ${p}; hai bên xử lý độc lập.`);
+  yield* qsort(a, lo, p - 1);
+  yield* qsort(a, p + 1, hi);
+}
+
+function* partitionLomuto(a, lo, hi) {
+  const pv = a[hi];
+  yield pivot(hi, 7, `Chọn chốt = a[${hi}] = ${pv} (phần tử cuối đoạn).`, { lo, hi });
+  let i = lo - 1;
+
+  for (let j = lo; j < hi; j++) {
+    yield compare(j, hi, 9, `So sánh a[${j}] = ${a[j]} với chốt ${pv}.`, { i, j, lo, hi });
+    if (a[j] <= pv) {
+      i++;
+      if (i !== j) {
+        yield swap(i, j, 9, `a[${j}] ≤ chốt → đưa về cuối vùng "nhỏ hơn" bằng cách đổi với a[${i}].`, { i, j, lo, hi });
+        const t = a[i]; a[i] = a[j]; a[j] = t;
+      } else {
+        yield note(9, `a[${j}] ≤ chốt và vốn đã nằm đúng vùng "nhỏ hơn" → chỉ cần mở rộng vùng.`, { i, j, lo, hi });
+      }
+    } else {
+      yield note(9, `a[${j}] > chốt → để nguyên, nó thuộc vùng "lớn hơn".`, { i, j, lo, hi });
+    }
+  }
+
+  yield swap(i + 1, hi, 10, `Đặt chốt vào ranh giới hai vùng: đổi a[${i + 1}] với a[${hi}].`, { i: i + 1, lo, hi });
+  const t = a[i + 1]; a[i + 1] = a[hi]; a[hi] = t;
+  yield pivot(null, 10, `Phân hoạch xong: mọi thứ bên trái ≤ ${pv} ≤ mọi thứ bên phải.`);
+  return i + 1;
+}
+
+/* ------------------------------------------------------------------ *
+ * 7. Heap Sort — dựng max-heap rồi rút dần phần tử lớn nhất
+ * ------------------------------------------------------------------ */
+
+const HEAP_CODE = [
+  '// giai đoạn 1: biến mảng thành max-heap',
+  'for i ← n/2-1 … 0:  siftDown(i, n)',
+  '// giai đoạn 2: rút dần gốc (phần tử lớn nhất) về cuối',
+  'for end ← n-1 … 1:',
+  '    swap(a[0], a[end])            // max về đúng chỗ',
+  '    siftDown(0, end)          // khôi phục max-heap',
+  '',
+  'siftDown(i, size):',
+  '    l ← 2i+1;  r ← 2i+2;  largest ← i',
+  '    if l < size and a[l] > a[largest]: largest ← l',
+  '    if r < size and a[r] > a[largest]: largest ← r',
+  '    if largest ≠ i: swap(a[i], a[largest]); đi xuống',
+];
+
+function* heapSort(a) {
+  const n = a.length;
+  yield note(0, 'Giai đoạn 1 — coi mảng như cây nhị phân: con của i là 2i+1 và 2i+2. Ta biến nó thành max-heap.');
+
+  for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+    yield note(1, `Sàng xuống từ nút ${i} (nút trong cuối cùng chưa xử lý).`, { i });
+    yield* siftDown(a, i, n);
+  }
+  yield note(2, 'Đã có max-heap: a[0] là phần tử lớn nhất toàn mảng.');
+
+  for (let end = n - 1; end > 0; end--) {
+    yield swap(0, end, 4, `Đưa gốc a[0] = ${a[0]} (lớn nhất trong heap) về cuối heap, vị trí ${end}.`, { i: 0, j: end });
+    const t = a[0]; a[0] = a[end]; a[end] = t;
+    yield sorted(end, end, 4, `a[${end}] = ${a[end]} chốt vị trí, thu nhỏ heap còn ${end} phần tử.`);
+    yield note(5, `Gốc mới có thể vi phạm tính chất heap → sàng xuống để khôi phục.`, { i: 0 });
+    yield* siftDown(a, 0, end);
+  }
+  yield sorted(0, n - 1, 5, 'Hoàn tất.');
+}
+
+function* siftDown(a, i, size) {
+  while (true) {
+    const l = 2 * i + 1, r = 2 * i + 2;
+    let largest = i;
+
+    if (l < size) {
+      yield compare(l, largest, 8, `So sánh con trái a[${l}] = ${a[l]} với a[${largest}] = ${a[largest]}.`, { i, j: l });
+      if (a[l] > a[largest]) largest = l;
+    }
+    if (r < size) {
+      yield compare(r, largest, 9, `So sánh con phải a[${r}] = ${a[r]} với a[${largest}] = ${a[largest]}.`, { i, j: r });
+      if (a[r] > a[largest]) largest = r;
+    }
+    if (largest === i) {
+      yield note(10, `a[${i}] đã lớn hơn cả hai con → tính chất heap thoả mãn, dừng sàng.`, { i });
+      return;
+    }
+
+    yield swap(i, largest, 10, `Con a[${largest}] = ${a[largest]} lớn hơn cha a[${i}] = ${a[i]} → đổi chỗ rồi đi xuống tiếp.`, { i, j: largest });
+    const t = a[i]; a[i] = a[largest]; a[largest] = t;
+    i = largest;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * 8. Counting Sort — đếm phân phối, không so sánh
+ * ------------------------------------------------------------------ */
+
+const COUNTING_CODE = [
+  'max ← giá trị lớn nhất của a',
+  'count[0..max] ← 0',
+  'for x in a:  count[x] += 1        // đếm tần suất',
+  'for v ← 1 … max:  count[v] += count[v-1]   // cộng dồn',
+  'for i ← n-1 … 0:              // ngược → giữ ổn định',
+  '    count[a[i]] ← count[a[i]] - 1',
+  '    out[ count[a[i]] ] ← a[i]',
+  'chép out về a',
+];
+
+function* countingSort(a) {
+  const n = a.length;
+  if (n === 0) return;
+
+  let max = a[0];
+  for (let i = 1; i < n; i++) {
+    yield compare(i, i, 0, `Tìm giá trị lớn nhất: xét a[${i}] = ${a[i]} (lớn nhất hiện tại ${max}).`, { i });
+    if (a[i] > max) max = a[i];
+  }
+
+  const count = new Array(max + 1).fill(0);
+  yield aux({ label: `count[0..${max}] — tần suất`, values: count.slice(), highlight: -1 }, 1,
+    `Tạo mảng đếm count có ${max + 1} ô, tất cả bằng 0.`);
+
+  for (let i = 0; i < n; i++) {
+    count[a[i]]++;
+    yield aux({ label: `count[0..${max}] — tần suất`, values: count.slice(), highlight: a[i] }, 2,
+      `Gặp giá trị ${a[i]} → count[${a[i]}] tăng lên ${count[a[i]]}.`, { i });
+  }
+
+  for (let v = 1; v <= max; v++) {
+    count[v] += count[v - 1];
+    yield aux({ label: `count — cộng dồn (vị trí kết thúc)`, values: count.slice(), highlight: v }, 3,
+      `Cộng dồn: count[${v}] = ${count[v]} → có ${count[v]} phần tử ≤ ${v}, nên giá trị ${v} kết thúc ở vị trí ${count[v] - 1}.`);
+  }
+
+  const out = new Array(n);
+  for (let i = n - 1; i >= 0; i--) {
+    const v = a[i];
+    count[v]--;
+    out[count[v]] = v;
+    yield aux({ label: `count — cộng dồn (vị trí kết thúc)`, values: count.slice(), highlight: v }, 6,
+      `Đặt a[${i}] = ${v} vào ô ${count[v]} của mảng kết quả, rồi giảm count[${v}] để phần tử ${v} tiếp theo đứng ngay trước nó (đây chính là chỗ tạo ra tính ổn định).`, { i });
+  }
+
+  for (let i = 0; i < n; i++) {
+    yield write(i, out[i], 7, `Chép kết quả về: a[${i}] = ${out[i]}.`, { i });
+    a[i] = out[i];
+    yield sorted(i, i, 7, `a[${i}] đã đúng chỗ.`);
+  }
+  yield aux(null, 7,
+    'Hoàn tất. Thứ tự được quyết định hoàn toàn bằng chỉ số mảng, không phải bằng việc so sánh ' +
+    'hai phần tử với nhau — bộ đếm "So sánh" ở trên chỉ đến từ lượt quét tìm giá trị lớn nhất.');
+}
+
+/* ------------------------------------------------------------------ *
+ * 9. Radix Sort (LSD, cơ số 10) — counting sort lặp theo từng chữ số
+ * ------------------------------------------------------------------ */
+
+const RADIX_CODE = [
+  'max ← giá trị lớn nhất của a',
+  'for exp ← 1, 10, 100, … khi max/exp > 0:',
+  '    count[0..9] ← 0',
+  '    for x in a:  count[ (x/exp) % 10 ] += 1',
+  '    for d ← 1 … 9:  count[d] += count[d-1]',
+  '    for i ← n-1 … 0:            // ngược → giữ ổn định',
+  '        out[ --count[(a[i]/exp)%10] ] ← a[i]',
+  '    chép out về a   // xong tới chữ số vừa xét',
+];
+
+function* radixSort(a) {
+  const n = a.length;
+  if (n === 0) return;
+
+  let max = a[0];
+  for (let i = 1; i < n; i++) {
+    yield compare(i, i, 0, `Tìm giá trị lớn nhất để biết cần duyệt bao nhiêu chữ số: a[${i}] = ${a[i]}.`, { i });
+    if (a[i] > max) max = a[i];
+  }
+
+  const digitName = (exp) => (exp === 1 ? 'đơn vị' : exp === 10 ? 'chục' : exp === 100 ? 'trăm' : `10^${String(exp).length - 1}`);
+
+  for (let exp = 1; Math.floor(max / exp) > 0; exp *= 10) {
+    const count = new Array(10).fill(0);
+    yield aux({ label: `count[0..9] — hàng ${digitName(exp)}`, values: count.slice(), highlight: -1 }, 2,
+      `Lượt mới: sắp xếp theo chữ số hàng ${digitName(exp)} (exp = ${exp}).`);
+
+    for (let i = 0; i < n; i++) {
+      const d = Math.floor(a[i] / exp) % 10;
+      count[d]++;
+      yield aux({ label: `count[0..9] — hàng ${digitName(exp)}`, values: count.slice(), highlight: d }, 3,
+        `a[${i}] = ${a[i]} có chữ số hàng ${digitName(exp)} là ${d} → count[${d}] = ${count[d]}.`, { i });
+    }
+
+    for (let d = 1; d < 10; d++) {
+      count[d] += count[d - 1];
+      yield aux({ label: `count[0..9] — cộng dồn`, values: count.slice(), highlight: d }, 4,
+        `Cộng dồn: count[${d}] = ${count[d]}.`);
+    }
+
+    const out = new Array(n);
+    for (let i = n - 1; i >= 0; i--) {
+      const d = Math.floor(a[i] / exp) % 10;
+      count[d]--;
+      out[count[d]] = a[i];
+      yield aux({ label: `count[0..9] — cộng dồn`, values: count.slice(), highlight: d }, 6,
+        `Đưa a[${i}] = ${a[i]} (chữ số ${d}) vào ô ${count[d]} của kết quả lượt này.`, { i });
+    }
+
+    for (let i = 0; i < n; i++) {
+      yield write(i, out[i], 7, `Chép về: a[${i}] = ${out[i]}.`, { i });
+      a[i] = out[i];
+    }
+    yield note(7, `Xong hàng ${digitName(exp)}: mảng đã có thứ tự theo mọi chữ số từ hàng đơn vị tới hàng này.`);
+  }
+
+  yield aux(null, 7, 'Hoàn tất.');
+  yield sorted(0, n - 1, 7,
+    'Hoàn tất: sau lượt của chữ số cao nhất, toàn mảng đã có thứ tự — mà không lần nào ' +
+    'phải so sánh hai phần tử với nhau để xếp thứ tự.');
+}
+
+/* ------------------------------------------------------------------ *
+ * Danh mục
+ * ------------------------------------------------------------------ */
+
+const ALGORITHMS = [
+  { id: 'bubble',    name: 'Bubble Sort',    vi: 'Sắp xếp nổi bọt',       family: 'so sánh', pseudocode: BUBBLE_CODE,    run: bubbleSort },
+  { id: 'selection', name: 'Selection Sort', vi: 'Sắp xếp chọn',          family: 'so sánh', pseudocode: SELECTION_CODE, run: selectionSort },
+  { id: 'insertion', name: 'Insertion Sort', vi: 'Sắp xếp chèn',          family: 'so sánh', pseudocode: INSERTION_CODE, run: insertionSort },
+  { id: 'shell',     name: 'Shell Sort',     vi: 'Sắp xếp Shell',         family: 'so sánh', pseudocode: SHELL_CODE,     run: shellSort },
+  { id: 'merge',     name: 'Merge Sort',     vi: 'Sắp xếp trộn',          family: 'so sánh', pseudocode: MERGE_CODE,     run: mergeSort },
+  { id: 'quick',     name: 'Quick Sort',     vi: 'Sắp xếp nhanh',         family: 'so sánh', pseudocode: QUICK_CODE,     run: quickSort },
+  { id: 'heap',      name: 'Heap Sort',      vi: 'Sắp xếp vun đống',      family: 'so sánh', pseudocode: HEAP_CODE,      run: heapSort },
+  { id: 'counting',  name: 'Counting Sort',  vi: 'Sắp xếp đếm phân phối', family: 'phân phối', pseudocode: COUNTING_CODE, run: countingSort },
+  { id: 'radix',     name: 'Radix Sort',     vi: 'Sắp xếp cơ số',         family: 'phân phối', pseudocode: RADIX_CODE,    run: radixSort },
+];
+
+function getAlgorithm(id) {
+  return ALGORITHMS.find((x) => x.id === id) || ALGORITHMS[0];
+}
+
+/**
+ * Chạy hết generator và thu về mảng các bước.
+ * Có `limit` để phòng trường hợp một thuật toán mới bị lỗi vòng lặp vô hạn.
+ */
+function recordSteps(algorithm, input, limit = 400000) {
+  const work = input.slice();
+  const steps = [];
+  for (const s of algorithm.run(work)) {
+    steps.push(s);
+    if (steps.length >= limit) break;
+  }
+  return { steps, result: work };
+}
+
+/* ==== js/explain.js ==== */
+/**
+ * explain.js — Phần "mô tả rõ cách hoạt động" cho từng thuật toán.
+ * Tách riêng khỏi algorithms.js để phần mã thuật toán giữ được sự gọn gàng.
+ */
+
+const EXPLAIN = {
+  bubble: {
+    idea:
+      'Quét mảng từ trái sang phải, hễ thấy hai phần tử liền kề sai thứ tự thì đổi chỗ. ' +
+      'Sau mỗi lượt quét, phần tử lớn nhất chắc chắn bị đẩy về cuối — giống bọt khí nổi lên mặt nước.',
+    mechanism: [
+      'Đặt cờ <code>swapped = false</code> ở đầu mỗi lượt quét.',
+      'Đi từ j = 0 đến hết đoạn chưa chốt, so sánh <code>a[j]</code> với <code>a[j+1]</code>.',
+      'Nếu <code>a[j] &gt; a[j+1]</code> thì đổi chỗ và bật <code>swapped = true</code>.',
+      'Hết lượt, ô cuối đoạn đã chắc chắn đúng → thu ngắn đoạn cần quét đi 1.',
+      'Nếu cả lượt không đổi chỗ lần nào thì mảng đã có thứ tự → dừng sớm. Đây là lý do trường hợp tốt nhất chỉ tốn O(n).',
+    ],
+    complexity: { best: 'O(n)', avg: 'O(n²)', worst: 'O(n²)', space: 'O(1)' },
+    stable: true,
+    inPlace: true,
+    strengths: ['Dễ hiểu, dễ cài đặt nhất', 'Ổn định', 'Phát hiện được mảng đã sắp xếp chỉ trong 1 lượt'],
+    weaknesses: ['Số phép đổi chỗ rất lớn', 'Chậm nhất nhóm O(n²) trong thực tế', 'Hầu như không dùng trong sản phẩm thật'],
+    watch:
+      'Để ý cạnh phải: sau mỗi lượt lại có thêm một cột chuyển xanh. Với mảng đảo ngược, ' +
+      'mỗi cột phải "lết" từng bước một sang phải — đó chính là hình ảnh của O(n²).',
+  },
+
+  selection: {
+    idea:
+      'Chia mảng thành hai phần: bên trái đã sắp xếp, bên phải chưa. Mỗi lượt quét toàn bộ phần chưa sắp xếp ' +
+      'để tìm phần tử nhỏ nhất, rồi đổi nó về đầu phần chưa sắp xếp.',
+    mechanism: [
+      'Đặt <code>min = i</code> (giả sử phần tử đầu đoạn chưa sắp xếp là nhỏ nhất).',
+      'Duyệt j từ i+1 đến n-1, mỗi lần thấy <code>a[j] &lt; a[min]</code> thì cập nhật <code>min = j</code>.',
+      'Hết vòng trong, đổi chỗ <code>a[i]</code> với <code>a[min]</code> (bỏ qua nếu chúng trùng nhau).',
+      'Ranh giới phần đã sắp xếp tiến sang phải một ô. Lặp lại cho tới hết.',
+    ],
+    complexity: { best: 'O(n²)', avg: 'O(n²)', worst: 'O(n²)', space: 'O(1)' },
+    stable: false,
+    inPlace: true,
+    strengths: ['Số phép GHI ít nhất: tối đa n-1 lần đổi chỗ', 'Hữu ích khi ghi dữ liệu đắt (bộ nhớ flash)', 'Thời gian chạy rất đều, dễ dự đoán'],
+    weaknesses: ['Luôn O(n²) kể cả khi mảng đã sắp xếp sẵn', 'Không ổn định (cú đổi chỗ xa có thể nhảy qua phần tử bằng nhau)'],
+    watch:
+      'Con trỏ min bò suốt phần chưa sắp xếp rồi mới có đúng một cú đổi chỗ. So với Bubble Sort: ' +
+      'số lần so sánh y hệt nhau, nhưng số lần đổi chỗ ít hơn hàng chục lần.',
+  },
+
+  insertion: {
+    idea:
+      'Giống cách bạn xếp bài trên tay: rút từng quân bài mới ra, dịch các quân lớn hơn sang phải để tạo chỗ trống, ' +
+      'rồi đặt quân đó vào đúng vị trí trong phần đã xếp.',
+    mechanism: [
+      'Coi <code>a[0]</code> là đoạn đã sắp xếp.',
+      'Với mỗi i từ 1 đến n-1, lưu <code>key = a[i]</code> ra một biến — ô a[i] giờ là "chỗ trống".',
+      'Đi ngược từ j = i-1: chừng nào <code>a[j] &gt; key</code> thì chép <code>a[j]</code> sang <code>a[j+1]</code> (chỗ trống dịch sang trái).',
+      'Khi gặp phần tử <code>≤ key</code> (hoặc hết mảng) thì đặt key vào chỗ trống.',
+      'Lưu ý: đây là phép DỊCH chứ không phải đổi chỗ — mỗi lần chỉ tốn 1 phép ghi, rẻ hơn đổi chỗ (3 phép ghi).',
+    ],
+    complexity: { best: 'O(n)', avg: 'O(n²)', worst: 'O(n²)', space: 'O(1)' },
+    stable: true,
+    inPlace: true,
+    strengths: [
+      'Cực nhanh với mảng nhỏ hoặc gần như đã sắp xếp (O(n + số cặp nghịch thế))',
+      'Ổn định, tại chỗ, chạy online (nhận thêm phần tử vẫn xử lý được)',
+      'Được dùng thật: Timsort/Introsort chuyển sang insertion sort khi đoạn còn dưới ~16–32 phần tử',
+    ],
+    weaknesses: ['Vẫn là O(n²) với dữ liệu ngẫu nhiên cỡ lớn'],
+    watch:
+      'Chọn dữ liệu "gần như đã sắp xếp": mỗi quân bài chỉ lùi một hai ô là xong. Đổi sang "đảo ngược": ' +
+      'mỗi quân phải lết về tận đầu mảng — đúng trường hợp xấu nhất.',
+  },
+
+  shell: {
+    idea:
+      'Insertion Sort nhưng so sánh những phần tử cách nhau một khoảng <code>gap</code> lớn trước. ' +
+      'Nhờ đó phần tử lệch xa có thể nhảy một phát về gần đúng chỗ, thay vì lết từng ô. Gap giảm dần về 1.',
+    mechanism: [
+      'Bắt đầu với <code>gap = n/2</code>.',
+      'Với gap hiện tại, chạy insertion sort trên từng dãy con gồm các phần tử cách nhau đúng gap ô.',
+      'Chia đôi gap rồi lặp lại. Mảng ngày càng "gần đúng thứ tự" hơn.',
+      'Lượt cuối cùng có gap = 1 chính là insertion sort thường — nhưng lúc này mảng đã gần sắp xếp nên rất nhanh.',
+    ],
+    complexity: { best: 'O(n log n)', avg: '≈ O(n^1.25)', worst: 'O(n²) (dãy gap n/2)', space: 'O(1)' },
+    stable: false,
+    inPlace: true,
+    strengths: ['Nhanh hơn hẳn insertion sort mà vẫn ngắn gọn, không cần bộ nhớ phụ', 'Hợp cho hệ nhúng, thư viện nhỏ'],
+    weaknesses: ['Độ phức tạp phụ thuộc dãy gap và vẫn chưa có lời giải đóng chặt chẽ', 'Không ổn định'],
+    watch:
+      'Ở gap lớn, các cột nhảy vọt qua nửa mảng. Càng về sau bước nhảy càng ngắn, mảng trông ngày càng "mượt" ' +
+      'trước khi lượt gap = 1 hoàn thiện nốt.',
+  },
+
+  merge: {
+    idea:
+      'Chia để trị: cắt đôi mảng, sắp xếp từng nửa (bằng đệ quy), rồi TRỘN hai nửa đã có thứ tự thành một. ' +
+      'Trộn hai dãy đã sắp xếp chỉ tốn thời gian tuyến tính vì mỗi bước chỉ cần so sánh hai phần tử đầu.',
+    mechanism: [
+      'Nếu đoạn có ≤ 1 phần tử thì nó đã có thứ tự → dừng đệ quy.',
+      'Cắt tại <code>mid</code>, gọi đệ quy cho nửa trái rồi nửa phải.',
+      'Trộn: đặt con trỏ i ở đầu nửa trái, j ở đầu nửa phải; mỗi bước lấy phần tử nhỏ hơn ra mảng tạm rồi đẩy con trỏ tương ứng.',
+      'Một nửa hết trước thì nối thẳng phần còn lại của nửa kia vào mảng tạm.',
+      'Chép mảng tạm trở lại đúng đoạn <code>a[lo..hi]</code>.',
+      'Dùng <code>a[i] ≤ a[j]</code> (không phải <code>&lt;</code>) để khi bằng nhau thì phần tử bên trái ra trước → giữ tính ổn định.',
+    ],
+    complexity: { best: 'O(n log n)', avg: 'O(n log n)', worst: 'O(n log n)', space: 'O(n)' },
+    stable: true,
+    inPlace: false,
+    strengths: [
+      'O(n log n) trong MỌI trường hợp, không có ca xấu bất ngờ',
+      'Ổn định → nền tảng của Timsort (Python, Java cho object)',
+      'Truy cập dữ liệu tuần tự → hợp cho sắp xếp ngoài (external sort) và danh sách liên kết',
+    ],
+    weaknesses: ['Cần O(n) bộ nhớ phụ', 'Hằng số lớn hơn quicksort trên mảng trong RAM'],
+    watch:
+      'Nửa đầu animation gần như không thay đổi gì — đó là lúc đệ quy đang đi xuống tận đáy. ' +
+      'Các thay đổi thực sự chỉ xảy ra ở bước "chép mảng tạm về", và đoạn được trộn ngày một dài ra.',
+  },
+
+  quick: {
+    idea:
+      'Chọn một phần tử làm CHỐT (pivot), dồn mọi phần tử nhỏ hơn sang trái và lớn hơn sang phải. ' +
+      'Sau bước đó chốt đã nằm đúng vị trí cuối cùng, và hai bên được xử lý độc lập bằng đệ quy.',
+    mechanism: [
+      'Sơ đồ Lomuto: lấy <code>pivot = a[hi]</code>, dùng biến i đánh dấu cuối vùng "nhỏ hơn hoặc bằng chốt".',
+      'Duyệt j từ lo đến hi-1: nếu <code>a[j] ≤ pivot</code> thì tăng i và đổi chỗ <code>a[i]</code> với <code>a[j]</code> — tức là kết nạp a[j] vào vùng nhỏ.',
+      'Cuối cùng đổi <code>a[i+1]</code> với chốt để chốt về đúng ranh giới hai vùng. Vị trí i+1 là kết quả phân hoạch.',
+      'Gọi đệ quy cho <code>[lo, p-1]</code> và <code>[p+1, hi]</code>. Không cần bước "trộn" nào cả.',
+      'Chọn chốt kém (ví dụ luôn lấy phần tử cuối trên mảng đã sắp xếp) làm cây đệ quy suy biến → O(n²). Thực tế người ta dùng median-of-three hoặc chốt ngẫu nhiên để tránh.',
+    ],
+    complexity: { best: 'O(n log n)', avg: 'O(n log n)', worst: 'O(n²)', space: 'O(log n) (ngăn xếp đệ quy)' },
+    stable: false,
+    inPlace: true,
+    strengths: [
+      'Nhanh nhất trong thực tế với mảng trong RAM: truy cập liên tục, thân thiện với cache',
+      'Sắp xếp tại chỗ, chỉ tốn ngăn xếp đệ quy',
+      'Là lõi của Introsort — std::sort của C++',
+    ],
+    weaknesses: ['Trường hợp xấu O(n²) nếu chọn chốt tệ', 'Không ổn định'],
+    watch:
+      'Chọn dữ liệu "đã sắp xếp" rồi chạy: chốt luôn là phần tử lớn nhất nên mỗi lần phân hoạch chỉ cắt được 1 phần tử — ' +
+      'số bước phình lên thấy rõ. Đó chính là trường hợp xấu nhất O(n²).',
+  },
+
+  heap: {
+    idea:
+      'Coi mảng như một cây nhị phân (con của i là 2i+1 và 2i+2). Biến nó thành max-heap — cha luôn lớn hơn con — ' +
+      'rồi liên tục lấy gốc (phần tử lớn nhất) đổi về cuối và thu nhỏ heap lại.',
+    mechanism: [
+      'Giai đoạn 1 — dựng heap: gọi <code>siftDown</code> cho các nút trong, đi ngược từ <code>n/2-1</code> về 0. Cách này chỉ tốn O(n), rẻ hơn chèn từng phần tử.',
+      '<code>siftDown(i)</code>: so cha với hai con, nếu con lớn hơn thì đổi chỗ rồi đi xuống tiếp theo nhánh đó.',
+      'Giai đoạn 2 — rút phần tử: đổi <code>a[0]</code> (lớn nhất) với phần tử cuối heap, coi ô cuối đó đã chốt.',
+      'Heap ngắn đi 1, gốc mới có thể sai → <code>siftDown(0)</code> để khôi phục. Lặp lại cho tới khi heap còn 1 phần tử.',
+    ],
+    complexity: { best: 'O(n log n)', avg: 'O(n log n)', worst: 'O(n log n)', space: 'O(1)' },
+    stable: false,
+    inPlace: true,
+    strengths: [
+      'O(n log n) đảm bảo VÀ sắp xếp tại chỗ — kết hợp duy nhất trong nhóm này',
+      'Là "lưới an toàn" của Introsort: khi quicksort đệ quy quá sâu thì chuyển sang heapsort',
+      'Cùng cấu trúc dữ liệu với hàng đợi ưu tiên',
+    ],
+    weaknesses: ['Nhảy bộ nhớ xa (2i+1) → kém thân thiện cache, thực tế chậm hơn quicksort', 'Không ổn định'],
+    watch:
+      'Giai đoạn 1 nhìn hỗn loạn nhưng ngắn. Giai đoạn 2 rất đều đặn: cột cao nhất luôn bị bốc từ vị trí 0 về cuối, ' +
+      'rồi một cột nhỏ từ cuối "chìm" dần xuống theo hình chữ chi.',
+  },
+
+  counting: {
+    idea:
+      'Không so sánh phần tử nào với nhau. Thay vào đó ĐẾM xem mỗi giá trị xuất hiện bao nhiêu lần, ' +
+      'cộng dồn để biết mỗi giá trị phải nằm ở đoạn nào trong kết quả, rồi đặt thẳng vào chỗ đó.',
+    mechanism: [
+      'Tìm giá trị lớn nhất <code>max</code>, tạo mảng <code>count</code> có max+1 ô, khởi tạo 0.',
+      'Duyệt mảng, mỗi giá trị x làm <code>count[x]++</code> → có bảng tần suất.',
+      'Cộng dồn: <code>count[v] += count[v-1]</code>. Giờ <code>count[v]</code> = số phần tử ≤ v = vị trí kết thúc của nhóm giá trị v.',
+      'Duyệt mảng gốc từ PHẢI sang TRÁI: giảm <code>count[a[i]]</code> rồi đặt <code>a[i]</code> vào ô đó của mảng kết quả.',
+      'Duyệt ngược chính là mẹo giữ tính ổn định: phần tử đứng sau được đặt vào ô sau trong cùng nhóm giá trị.',
+    ],
+    complexity: { best: 'O(n + k)', avg: 'O(n + k)', worst: 'O(n + k)', space: 'O(n + k)' },
+    stable: true,
+    inPlace: false,
+    strengths: [
+      'Tuyến tính — phá được cận dưới Ω(n log n) vì không dùng phép so sánh',
+      'Ổn định, nên dùng làm bước con cho radix sort',
+      'Lý tưởng khi k (miền giá trị) nhỏ: tuổi, điểm thi, byte, mã màu',
+    ],
+    weaknesses: [
+      'Chỉ dùng được cho số nguyên (hoặc khoá ánh xạ được về số nguyên) trong miền hẹp',
+      'k lớn thì bộ nhớ nổ: sắp 10 số trong miền 0..1 tỉ là vô lý',
+    ],
+    watch:
+      'Nhìn dải <code>count</code> bên dưới. Giai đoạn 1 nó là biểu đồ tần suất; sau khi cộng dồn nó biến thành ' +
+      'dãy không giảm — mỗi ô lúc này là "ranh giới kết thúc" của một nhóm giá trị.',
+  },
+
+  radix: {
+    idea:
+      'Sắp xếp theo từng chữ số, bắt đầu từ hàng đơn vị (LSD). Mỗi lượt dùng counting sort — ' +
+      'vì counting sort ổn định nên thứ tự do các lượt trước tạo ra được giữ nguyên, cứ thế cộng dồn thành thứ tự đúng.',
+    mechanism: [
+      'Với <code>exp = 1, 10, 100, …</code> cho tới khi vượt quá số lớn nhất:',
+      'Đếm chữ số <code>(x / exp) % 10</code> của mọi phần tử vào <code>count[0..9]</code>.',
+      'Cộng dồn count để có vị trí kết thúc của mỗi chữ số.',
+      'Duyệt ngược mảng, rải từng phần tử vào mảng kết quả theo chữ số đó, rồi chép về.',
+      'Điểm mấu chốt: nếu bước con KHÔNG ổn định thì thuật toán sai hoàn toàn — công sức của các lượt trước sẽ bị xoá.',
+    ],
+    complexity: { best: 'O(d·(n+b))', avg: 'O(d·(n+b))', worst: 'O(d·(n+b))', space: 'O(n + b)' },
+    stable: true,
+    inPlace: false,
+    strengths: [
+      'Tuyến tính theo n khi số chữ số d cố định (ví dụ số 32-bit, khoá độ dài cố định)',
+      'Rất nhanh cho số nguyên lớn, chuỗi độ dài cố định, khoá ghép',
+      'Dùng thật trong cơ sở dữ liệu, GPU sort, sắp xếp mảng int cỡ lớn',
+    ],
+    weaknesses: ['Cần bộ nhớ phụ và nhiều lượt duyệt', 'Khó áp dụng cho khoá so sánh tuỳ ý (comparator tự do)'],
+    watch:
+      'Sau lượt hàng đơn vị, mảng trông vẫn "lộn xộn" — nhưng hãy chỉ nhìn chữ số cuối của mỗi số: chúng đã tăng dần. ' +
+      'Mỗi lượt tiếp theo thêm một chữ số vào phần đã đúng thứ tự.',
+  },
+};
+
+/** Bảng so sánh tổng hợp hiển thị ở cuối trang. */
+const COMPARISON_NOTE = `
+Cận dưới Ω(n log n) chỉ áp dụng cho thuật toán DỰA TRÊN SO SÁNH: với n phần tử có n! hoán vị,
+mỗi phép so sánh cho 1 bit thông tin, nên cần ít nhất log₂(n!) ≈ n log n phép so sánh.
+Counting sort và Radix sort thoát được cận này vì chúng không so sánh hai phần tử với nhau —
+chúng dùng chính GIÁ TRỊ của phần tử làm chỉ số mảng.
+`;
+
+/* ==== js/data.js ==== */
+/**
+ * data.js — Sinh dữ liệu đầu vào.
+ *
+ * Dạng dữ liệu quan trọng không kém thuật toán: cùng một thuật toán có
+ * thể nhanh gấp trăm lần hoặc chậm thảm hại chỉ vì mảng đầu vào có hình
+ * dạng khác. Mỗi dạng dưới đây làm lộ ra một tính chất khác nhau:
+ *
+ *   ngẫu nhiên   → trường hợp trung bình
+ *   gần sắp xếp  → insertion / bubble toả sáng (O(n)); quicksort bắt đầu đuối
+ *   đã sắp xếp   → trường hợp XẤU NHẤT của quicksort chốt-cuối
+ *   đảo ngược    → trường hợp xấu nhất của insertion / bubble
+ *   ít giá trị   → lộ vấn đề của phân hoạch Lomuto khi có nhiều khoá trùng
+ */
+
+const MIN_VALUE = 5;
+const MAX_VALUE = 100;
+
+const randInt = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
+
+const DISTRIBUTIONS = [
+  {
+    id: 'random',
+    label: 'Ngẫu nhiên',
+    hint: 'Trường hợp trung bình — mốc so sánh mặc định.',
+    make: (n) => Array.from({ length: n }, () => randInt(MIN_VALUE, MAX_VALUE)),
+  },
+  {
+    id: 'nearly',
+    label: 'Gần như đã sắp xếp',
+    hint: 'Chỉ vài cặp bị đảo. Insertion Sort gần như tuyến tính ở đây.',
+    make: (n) => {
+      const a = ramp(n);
+      const swaps = Math.max(1, Math.round(n * 0.06));
+      for (let k = 0; k < swaps; k++) {
+        const i = randInt(0, n - 1);
+        const j = Math.min(n - 1, i + randInt(1, 3));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    },
+  },
+  {
+    id: 'sorted',
+    label: 'Đã sắp xếp',
+    hint: 'Bubble/Insertion dừng gần như ngay. Quick Sort chốt-cuối rơi vào O(n²).',
+    make: (n) => ramp(n),
+  },
+  {
+    id: 'reversed',
+    label: 'Đảo ngược',
+    hint: 'Trường hợp xấu nhất của Insertion và Bubble Sort.',
+    make: (n) => ramp(n).reverse(),
+  },
+  {
+    id: 'few',
+    label: 'Ít giá trị khác nhau',
+    hint: 'Nhiều khoá trùng — thử với Quick Sort và để ý phân hoạch lệch.',
+    make: (n) => {
+      const palette = [10, 30, 55, 80, 100];
+      return Array.from({ length: n }, () => palette[randInt(0, palette.length - 1)]);
+    },
+  },
+];
+
+function ramp(n) {
+  if (n <= 1) return [MAX_VALUE];
+  return Array.from({ length: n }, (_, i) =>
+    Math.round(MIN_VALUE + (i * (MAX_VALUE - MIN_VALUE)) / (n - 1)));
+}
+
+function makeArray(distributionId, n) {
+  const d = DISTRIBUTIONS.find((x) => x.id === distributionId) || DISTRIBUTIONS[0];
+  return d.make(n);
+}
+
+function getDistribution(id) {
+  return DISTRIBUTIONS.find((x) => x.id === id) || DISTRIBUTIONS[0];
+}
+
+/* ==== js/renderer.js ==== */
+/**
+ * renderer.js — Vẽ trạng thái mảng lên <canvas>.
+ *
+ * Renderer là hàm THUẦN theo nghĩa: cùng một `state` thì luôn vẽ ra cùng
+ * một khung hình. Nó không biết gì về thuật toán, chỉ biết đọc state:
+ *   array, sorted, range, pivot, marks, step
+ *
+ * Màu lấy từ biến CSS nên trang tự đổi màu theo chế độ sáng/tối mà
+ * renderer không cần biết gì thêm.
+ */
+
+function createRenderer(canvas) {
+  const ctx = canvas.getContext('2d');
+  let colors = readColors(canvas);
+  let width = 0, height = 0;
+
+  function readColors(el) {
+    const cs = getComputedStyle(el);
+    const get = (name, fallback) => (cs.getPropertyValue(name).trim() || fallback);
+    return {
+      bar:        get('--bar', '#7c8db5'),
+      barCompare: get('--bar-compare', '#f5a524'),
+      barSwap:    get('--bar-swap', '#e5484d'),
+      barSorted:  get('--bar-sorted', '#30a46c'),
+      barPivot:   get('--bar-pivot', '#8e4ec6'),
+      rangeBg:    get('--range-bg', 'rgba(124,141,181,.14)'),
+      label:      get('--label', '#334'),
+      muted:      get('--muted', '#8a93a6'),
+      hold:       get('--hold', '#0091ff'),
+      panel:      get('--panel', '#ffffff'),
+    };
+  }
+
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    width = Math.max(1, Math.floor(rect.width));
+    height = Math.max(1, Math.floor(rect.height));
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    colors = readColors(canvas);
+  }
+
+  /**
+   * @param {object} state    trạng thái từ steps.js
+   * @param {object} opts     { maxValue, tween } — tween ∈ [0,1] cho hiệu ứng đổi chỗ
+   */
+  function draw(state, opts = {}) {
+    const a = state.array;
+    const n = a.length;
+    const maxValue = opts.maxValue || Math.max(1, ...a);
+    const tween = opts.tween == null ? 1 : opts.tween;
+
+    ctx.clearRect(0, 0, width, height);
+    if (n === 0) return;
+
+    const padX = 10;
+    const footer = 46;                     // chỗ cho nhãn giá trị & các làn con trỏ
+    const plotW = width - padX * 2;
+    const plotH = height - footer - 8;
+    const slot = plotW / n;
+    const gap = Math.min(4, Math.max(0.5, slot * 0.16));
+    const barW = Math.max(1, slot - gap);
+    const xOf = (i) => padX + i * slot + gap / 2;
+    const hOf = (v) => Math.max(2, (v / maxValue) * plotH);
+    const baseY = height - footer;
+
+    // 1. Nền của đoạn đang được xử lý
+    if (state.range) {
+      const [from, to] = state.range;
+      ctx.fillStyle = colors.rangeBg;
+      ctx.fillRect(xOf(from) - gap / 2, 4, (to - from + 1) * slot, baseY - 4 + 6);
+    }
+
+    const step = state.step;
+    const active = new Set();
+    let swapPair = null;
+    if (step) {
+      if (step.op === 'compare') { active.add(step.i); active.add(step.j); }
+      if (step.op === 'swap')    { swapPair = [step.i, step.j]; }
+      if (step.op === 'write')   { active.add(step.i); }
+    }
+
+    const colorOf = (i) => {
+      if (state.pivot === i) return colors.barPivot;
+      if (swapPair && (i === swapPair[0] || i === swapPair[1])) return colors.barSwap;
+      if (active.has(i)) return step && step.op === 'write' ? colors.barSwap : colors.barCompare;
+      if (state.sorted.has(i)) return colors.barSorted;
+      return colors.bar;
+    };
+
+    // 2. Các cột
+    const showValues = barW >= 16;
+    ctx.textAlign = 'center';
+    ctx.font = '600 11px ui-monospace, SFMono-Regular, Menlo, monospace';
+
+    // Hai cột đang đổi chỗ luôn gặp nhau đúng điểm giữa quãng đường, nên nếu
+    // cả hai cùng trượt dưới đất thì chúng đè lên nhau. Cách xử lý: cột THẤP
+    // hơn được nhấc bổng bay qua đầu cột cao hơn, và được vẽ sau cùng.
+    const animating = swapPair && tween < 1;
+    let flyer = -1, runner = -1, flyLift = 0;
+    if (animating) {
+      const [p, q] = swapPair;
+      const flyFirst = a[p] <= a[q];
+      flyer = flyFirst ? p : q;
+      runner = flyFirst ? q : p;
+      const clearance = hOf(a[runner]) + 10;              // đủ cao để vượt hẳn cột kia
+      flyLift = Math.min(clearance, baseY - hOf(a[flyer]) - 4);
+    }
+
+    const order = [];
+    for (let i = 0; i < n; i++) if (i !== flyer && i !== runner) order.push(i);
+    if (animating) order.push(runner, flyer);   // cột bay vẽ cuối → nằm trên cùng
+
+    for (const i of order) {
+      let x = xOf(i);
+      let lift = 0;
+
+      if (animating) {
+        const other = i === flyer ? runner : i === runner ? flyer : -1;
+        if (other >= 0) x = lerp(xOf(other), xOf(i), tween);
+        if (i === flyer) lift = arc(tween) * flyLift;
+      }
+
+      const h = hOf(a[i]);
+      const y = baseY - h - lift;
+
+      ctx.fillStyle = colorOf(i);
+      roundRect(ctx, x, y, barW, h, Math.min(3, barW / 3));
+      ctx.fill();
+
+      // Cột đang bay được viền bằng màu nền: hai cột cùng màu đỏ, nếu không
+      // viền thì lúc chồng nhau trông như một khối duy nhất.
+      if (i === flyer) {
+        ctx.strokeStyle = colors.panel;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      if (showValues) {
+        ctx.fillStyle = colors.label;
+        ctx.fillText(String(a[i]), xOf(i) + barW / 2, baseY + 13);
+      }
+    }
+
+    // 3. "Quân bài" đang cầm trên tay (insertion / shell sort)
+    const marks = state.marks || {};
+    if (marks.hold) {
+      const at = clamp(marks.hold.at, 0, n - 1);
+      const h = hOf(marks.hold.value);
+      const x = xOf(at);
+      const y = baseY - h - 24;
+      ctx.save();
+      ctx.globalAlpha = 0.28;
+      ctx.fillStyle = colors.hold;
+      roundRect(ctx, x, y, barW, h, Math.min(3, barW / 3));
+      ctx.fill();
+      ctx.restore();
+      ctx.strokeStyle = colors.hold;                 // viền nét đứt để không lẫn với cột thật
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 3]);
+      roundRect(ctx, x, y, barW, h, Math.min(3, barW / 3));
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = colors.hold;
+      ctx.font = '700 10px ui-monospace, SFMono-Regular, Menlo, monospace';
+      ctx.fillText(`⇩${marks.hold.value}`, x + barW / 2, y - 4);
+    }
+
+    // 4. Con trỏ i / j / min / mid / gap dưới chân cột
+    const pointers = [];
+    if (marks.i != null && marks.i >= 0)   pointers.push(['i', marks.i, colors.muted]);
+    if (marks.j != null && marks.j >= 0)   pointers.push(['j', marks.j, colors.barCompare]);
+    if (marks.min != null)                 pointers.push(['min', marks.min, colors.barSorted]);
+    if (marks.mid != null)                 pointers.push(['mid', marks.mid, colors.barPivot]);
+    if (state.pivot != null)               pointers.push(['chốt', state.pivot, colors.barPivot]);
+
+    ctx.font = '700 10px ui-monospace, SFMono-Regular, Menlo, monospace';
+    const laneY0 = baseY + (showValues ? 26 : 14);
+    const lanes = [];                 // lanes[k] = danh sách khoảng x đã bị chiếm ở làn k
+
+    for (const [name, idx, color] of pointers) {
+      if (idx < 0 || idx >= n) continue;
+      const cx = xOf(idx) + barW / 2;
+      const half = ctx.measureText(name).width / 2 + 3;
+
+      // Tìm làn đầu tiên còn trống để nhãn không đè lên nhau
+      let lane = 0;
+      while (lanes[lane] && lanes[lane].some(([l, r]) => cx - half < r && cx + half > l)) lane++;
+      (lanes[lane] ||= []).push([cx - half, cx + half]);
+
+      const y = laneY0 + lane * 11;
+      ctx.fillStyle = color;
+      ctx.fillText(name, cx, y);
+      ctx.beginPath();                                  // mũi tên luôn chỉ đúng cột
+      ctx.moveTo(cx, laneY0 - 12);
+      ctx.lineTo(cx - 3.5, laneY0 - 7);
+      ctx.lineTo(cx + 3.5, laneY0 - 7);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+
+  return { draw, resize, get colors() { return colors; } };
+}
+
+/* --------------------------- tiện ích nhỏ --------------------------- */
+
+const lerp = (a, b, t) => a + (b - a) * t;
+const arc = (t) => Math.sin(Math.PI * t);           // 0 → 1 → 0, tạo hình vòng cung
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+function roundRect(ctx, x, y, w, h, r) {
+  const rr = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + rr, y);
+  ctx.lineTo(x + w - rr, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + rr);
+  ctx.lineTo(x + w, y + h);
+  ctx.lineTo(x, y + h);
+  ctx.lineTo(x, y + rr);
+  ctx.quadraticCurveTo(x, y, x + rr, y);
+  ctx.closePath();
+}
+
+/* ==== js/player.js ==== */
+/**
+ * player.js — "Đầu phát" cho chuỗi bước.
+ *
+ * Toàn bộ animation quy về một bài toán rất đơn giản: ta có một băng gồm
+ * N bước; con trỏ `position` cho biết đã áp dụng bao nhiêu bước.
+ *
+ *   chạy tiếp  = position + 1  (áp dụng thêm 1 bước, rất rẻ)
+ *   tua lui    = dựng lại trạng thái từ đầu rồi áp dụng position bước
+ *   kéo thanh trượt = y hệt tua lui, tới vị trí bất kỳ
+ *
+ * Vì trạng thái luôn dựng lại được từ (mảng gốc + k bước đầu tiên), ta
+ * không cần lưu ảnh chụp nào, cũng không cần viết hàm "undo" cho từng
+ * thao tác — nguồn sự thật duy nhất là chuỗi bước.
+ *
+ * Vòng lặp thời gian dùng requestAnimationFrame với bộ tích luỹ thời gian,
+ * nên tốc độ phát không phụ thuộc tần số quét màn hình.
+ */
+
+
+const MAX_STEPS_PER_FRAME = 4000;   // chặn treo trình duyệt khi tua cực nhanh
+
+function createPlayer({ onFrame, onFinish }) {
+  let initial = [];
+  let steps = [];
+  let state = createState([]);
+  let position = 0;
+  let playing = false;
+  let speed = 12;          // số bước mỗi giây
+  let acc = 0;             // thời gian tích luỹ chưa tiêu thụ (ms)
+  let last = 0;
+  let raf = 0;
+
+  function load(initialArray, stepList) {
+    stop();
+    initial = initialArray.slice();
+    steps = stepList;
+    position = 0;
+    state = createState(initial);
+    emit();
+  }
+
+  function emit(tween = 1) {
+    onFrame(state, { tween, position, total: steps.length, playing });
+  }
+
+  function stepDuration() {
+    return 1000 / speed;
+  }
+
+  function forward(count = 1) {
+    let moved = 0;
+    while (moved < count && position < steps.length) {
+      applyStep(state, steps[position]);
+      position++;
+      moved++;
+    }
+    return moved;
+  }
+
+  function seek(pos) {
+    const target = Math.max(0, Math.min(pos, steps.length));
+    if (target === position) return;
+    if (target > position) {
+      forward(target - position);            // đi tới: áp dụng tiếp
+    } else {
+      state = replay(initial, steps, target); // đi lui: dựng lại từ đầu
+      position = target;
+    }
+    emit();
+  }
+
+  function tick(now) {
+    if (!playing) return;
+    const dt = Math.min(100, now - last);
+    last = now;
+    acc += dt;
+
+    const dur = stepDuration();
+    let budget = MAX_STEPS_PER_FRAME;
+    while (acc >= dur && position < steps.length && budget-- > 0) {
+      applyStep(state, steps[position]);
+      position++;
+      acc -= dur;
+    }
+    if (budget <= 0) acc = 0;
+
+    if (position >= steps.length) {
+      playing = false;
+      acc = 0;
+      emit(1);
+      if (onFinish) onFinish();
+      return;
+    }
+
+    // Tỉ lệ hoàn thành của bước vừa áp dụng → dùng cho hiệu ứng trượt khi đổi chỗ
+    const tween = dur > 60 ? Math.min(1, acc / Math.min(dur, 260)) : 1;
+    emit(tween);
+    raf = requestAnimationFrame(tick);
+  }
+
+  function play() {
+    if (playing || steps.length === 0) return;
+    if (position >= steps.length) seek(0);
+    playing = true;
+    last = performance.now();
+    acc = 0;
+    raf = requestAnimationFrame(tick);
+    emit(1);
+  }
+
+  function pause() {
+    if (!playing) return;
+    playing = false;
+    cancelAnimationFrame(raf);
+    emit(1);
+  }
+
+  function stop() {
+    playing = false;
+    cancelAnimationFrame(raf);
+    acc = 0;
+  }
+
+  return {
+    load,
+    play,
+    pause,
+    stop,
+    toggle: () => (playing ? pause() : play()),
+    next: () => { if (forward(1)) emit(1); },
+    prev: () => seek(position - 1),
+    seek,
+    reset: () => seek(0),
+    end: () => seek(steps.length),
+    setSpeed: (v) => { speed = Math.max(0.5, v); },
+    get speed() { return speed; },
+    get playing() { return playing; },
+    get position() { return position; },
+    get total() { return steps.length; },
+    get state() { return state; },
+    get steps() { return steps; },
+  };
+}
+
+/* ==== js/audio.js ==== */
+/**
+ * audio.js — Âm thanh phụ hoạ (tuỳ chọn).
+ *
+ * Mỗi phần tử được ánh xạ thành một cao độ: giá trị càng lớn thì tiếng
+ * càng cao. Nghe thì vui, nhưng nó thật sự có ích khi học: bubble sort
+ * nghe như tiếng "răng cưa" lặp đi lặp lại, còn merge sort nghe rõ từng
+ * đoạn quét lên đều đặn.
+ *
+ * AudioContext chỉ được tạo sau một thao tác chuột/phím của người dùng
+ * (yêu cầu của trình duyệt), nên hàm khởi tạo được gọi lười.
+ */
+
+function createAudio() {
+  let ctx = null;
+  let enabled = false;
+  let lastPlay = 0;
+
+  function ensure() {
+    if (!ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      ctx = new AC();
+    }
+    if (ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  }
+
+  /**
+   * @param {number} value    giá trị phần tử
+   * @param {number} maxValue giá trị lớn nhất (để chuẩn hoá cao độ)
+   * @param {string} kind     'compare' | 'swap' | 'write'
+   */
+  function ping(value, maxValue, kind = 'compare') {
+    if (!enabled) return;
+    const ac = ensure();
+    if (!ac) return;
+
+    const now = ac.currentTime;
+    if (now - lastPlay < 0.012) return;      // chống chói tai khi chạy nhanh
+    lastPlay = now;
+
+    const ratio = Math.max(0, Math.min(1, value / (maxValue || 1)));
+    const freq = 180 + ratio * 900;
+
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.type = kind === 'swap' ? 'triangle' : 'sine';
+    osc.frequency.value = freq;
+
+    const peak = kind === 'swap' ? 0.16 : 0.08;
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(peak, now + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+
+    osc.connect(gain).connect(ac.destination);
+    osc.start(now);
+    osc.stop(now + 0.1);
+  }
+
+  return {
+    ping,
+    get enabled() { return enabled; },
+    set enabled(v) { enabled = v; if (v) ensure(); },
+  };
+}
+
+/* ==== js/main.js ==== */
+/**
+ * main.js — Nối các mảnh lại: dữ liệu → thuật toán → chuỗi bước → đầu phát → màn hình.
+ *
+ *   data.js       sinh mảng đầu vào
+ *   algorithms.js chạy thuật toán, thu về chuỗi bước
+ *   player.js     phát chuỗi bước theo thời gian
+ *   renderer.js   vẽ trạng thái lên canvas
+ *   file này      cập nhật phần HTML còn lại (mã giả, thuyết minh, bộ đếm)
+ */
+
+
+const $ = (id) => document.getElementById(id);
+
+const el = {
+  algo: $('algo'), dist: $('dist'), size: $('size'), sizeOut: $('sizeOut'),
+  speed: $('speed'), speedOut: $('speedOut'),
+  shuffle: $('shuffle'), play: $('play'), next: $('next'), prev: $('prev'),
+  toStart: $('toStart'), toEnd: $('toEnd'), sound: $('sound'),
+  canvas: $('canvas'), aux: $('aux'), legend: $('legend'),
+  scrub: $('scrub'), posOut: $('posOut'), narration: $('narration'), stats: $('stats'),
+  algoName: $('algoName'), pseudocode: $('pseudocode'),
+  idea: $('idea'), mechanism: $('mechanism'), complexity: $('complexity'),
+  strengths: $('strengths'), weaknesses: $('weaknesses'), watch: $('watch'),
+  summary: $('summary'), lowerBound: $('lowerBound'), files: $('files'),
+};
+
+const renderer = createRenderer(el.canvas);
+const audio = createAudio();
+
+let current = { algo: ALGORITHMS[0], array: [], maxValue: MAX_VALUE };
+let codeLines = [];       // các <li> của mã giả
+let lastLine = -1;
+let auxCells = [];        // cache ô của mảng phụ
+
+const player = createPlayer({
+  onFrame: render,
+  onFinish: () => updatePlayButton(),
+});
+
+/* ------------------------------------------------------------------ *
+ * Khởi tạo giao diện tĩnh
+ * ------------------------------------------------------------------ */
+
+function fillSelects() {
+  el.algo.innerHTML = ALGORITHMS
+    .map((a) => `<option value="${a.id}">${a.name} — ${a.vi}</option>`).join('');
+  el.dist.innerHTML = DISTRIBUTIONS
+    .map((d) => `<option value="${d.id}">${d.label}</option>`).join('');
+}
+
+function buildLegend() {
+  const items = [
+    ['var(--bar)', 'chưa xét'],
+    ['var(--bar-compare)', 'đang so sánh'],
+    ['var(--bar-swap)', 'đang đổi chỗ / ghi'],
+    ['var(--bar-pivot)', 'phần tử chốt'],
+    ['var(--bar-sorted)', 'đã đúng thứ tự'],
+    ['var(--hold)', 'giá trị đang cầm trên tay'],
+  ];
+  el.legend.innerHTML = items
+    .map(([c, label]) => `<span><i style="background:${c}"></i>${label}</span>`).join('');
+}
+
+function buildSummary() {
+  const head = `<thead><tr>
+      <th>Thuật toán</th><th>Tốt nhất</th><th>Trung bình</th><th>Xấu nhất</th>
+      <th>Bộ nhớ</th><th>Ổn định</th><th>Tại chỗ</th><th>Dùng khi</th>
+    </tr></thead>`;
+  const rows = ALGORITHMS.map((a) => {
+    const e = EXPLAIN[a.id];
+    return `<tr data-id="${a.id}">
+      <td>${a.name}</td>
+      <td class="mono">${e.complexity.best}</td>
+      <td class="mono">${e.complexity.avg}</td>
+      <td class="mono">${e.complexity.worst}</td>
+      <td class="mono">${e.complexity.space}</td>
+      <td>${e.stable ? '<span class="yes">có</span>' : '<span class="no">không</span>'}</td>
+      <td>${e.inPlace ? '<span class="yes">có</span>' : '<span class="no">không</span>'}</td>
+      <td>${e.strengths[0]}</td>
+    </tr>`;
+  }).join('');
+  el.summary.innerHTML = head + `<tbody>${rows}</tbody>`;
+  el.lowerBound.textContent = COMPARISON_NOTE.trim();
+}
+
+function buildFileList() {
+  const files = [
+    ['js/steps.js', 'định nghĩa “bước” và hàm áp dụng một bước lên trạng thái'],
+    ['js/algorithms.js', '9 generator thuật toán + mã giả tương ứng'],
+    ['js/explain.js', 'nội dung giải thích, độ phức tạp, điểm mạnh/yếu'],
+    ['js/player.js', 'đầu phát: chạy, dừng, tua tới/lui, kéo thanh trượt'],
+    ['js/renderer.js', 'vẽ canvas từ trạng thái (thuần, không giữ state riêng)'],
+    ['js/data.js', 'sinh các dạng mảng đầu vào'],
+    ['js/audio.js', 'ánh xạ giá trị thành cao độ âm thanh'],
+    ['js/main.js', 'nối tất cả lại và cập nhật DOM'],
+    ['test/verify.mjs', 'kiểm chứng thuật toán đúng và chuỗi bước phát lại đúng'],
+  ];
+  el.files.innerHTML = files.map(([f, d]) => `<li><code>${f}</code> — ${d}</li>`).join('');
+}
+
+/* ------------------------------------------------------------------ *
+ * Đổi thuật toán / đổi dữ liệu
+ * ------------------------------------------------------------------ */
+
+function speedFromSlider(v) {
+  // 0 → 1 bước/giây, 100 → 500 bước/giây (thang mũ để đầu thang chỉnh mượt)
+  return Math.pow(500, v / 100);
+}
+
+function renderPseudocode(algo) {
+  el.algoName.textContent = `· ${algo.vi}`;
+  el.pseudocode.innerHTML = algo.pseudocode
+    .map((line) => {
+      const isComment = line.trim().startsWith('//');
+      return `<li class="${isComment ? 'comment' : ''}">${escapeHtml(line) || '&nbsp;'}</li>`;
+    }).join('');
+  codeLines = [...el.pseudocode.children];
+  lastLine = -1;
+}
+
+function renderExplain(algo) {
+  const e = EXPLAIN[algo.id];
+  el.idea.innerHTML = e.idea;
+  el.mechanism.innerHTML = e.mechanism.map((m) => `<li>${m}</li>`).join('');
+  el.complexity.innerHTML = `
+    <tr><td>Trường hợp tốt nhất</td><td>${e.complexity.best}</td></tr>
+    <tr><td>Trung bình</td><td>${e.complexity.avg}</td></tr>
+    <tr><td>Trường hợp xấu nhất</td><td>${e.complexity.worst}</td></tr>
+    <tr><td>Bộ nhớ phụ</td><td>${e.complexity.space}</td></tr>
+    <tr><td>Ổn định (stable)</td><td>${e.stable ? 'có' : 'không'}</td></tr>
+    <tr><td>Sắp xếp tại chỗ</td><td>${e.inPlace ? 'có' : 'không'}</td></tr>`;
+  el.strengths.innerHTML = e.strengths.map((s) => `<li>${s}</li>`).join('');
+  el.weaknesses.innerHTML = e.weaknesses.map((s) => `<li>${s}</li>`).join('');
+  el.watch.innerHTML = e.watch;
+
+  for (const tr of el.summary.querySelectorAll('tbody tr')) {
+    tr.classList.toggle('current', tr.dataset.id === algo.id);
+  }
+}
+
+/** Sinh mảng mới rồi nạp lại chuỗi bước. */
+function regenerate(newArray = true) {
+  const algo = getAlgorithm(el.algo.value);
+  const n = Number(el.size.value);
+
+  if (newArray || current.array.length !== n) {
+    current.array = makeArray(el.dist.value, n);
+  }
+  current.algo = algo;
+  current.maxValue = Math.max(MAX_VALUE, ...current.array);
+
+  const { steps } = recordSteps(algo, current.array);
+
+  renderPseudocode(algo);
+  renderExplain(algo);
+
+  el.scrub.max = String(steps.length);
+  el.scrub.value = '0';
+  player.load(current.array, steps);
+  updatePlayButton();
+}
+
+/* ------------------------------------------------------------------ *
+ * Vẽ một khung hình
+ * ------------------------------------------------------------------ */
+
+function render(state, info) {
+  renderer.draw(state, { maxValue: current.maxValue, tween: info.tween });
+
+  // dòng mã giả đang chạy
+  if (state.line !== lastLine) {
+    if (codeLines[lastLine]) codeLines[lastLine].classList.remove('active');
+    if (codeLines[state.line]) codeLines[state.line].classList.add('active');
+    lastLine = state.line;
+  }
+
+  // thuyết minh
+  el.narration.innerHTML = state.text
+    ? `${opBadge(state.step)}${escapeHtml(state.text)}`
+    : 'Bấm <strong>Chạy</strong> để bắt đầu.';
+
+  // bộ đếm
+  const s = state.stats;
+  el.stats.innerHTML = [
+    ['So sánh', s.comparisons],
+    ['Đổi chỗ', s.swaps],
+    ['Lần ghi mảng', s.writes],
+    ['Lượt truy cập', s.reads + s.writes],
+  ].map(([k, v]) => `<div class="stat">${k}<b>${v.toLocaleString('vi-VN')}</b></div>`).join('');
+
+  // thanh tua
+  if (el.scrub.value !== String(info.position)) el.scrub.value = String(info.position);
+  el.posOut.textContent = `bước ${info.position.toLocaleString('vi-VN')} / ${info.total.toLocaleString('vi-VN')}`;
+
+  renderAux(state.aux);
+
+  // âm thanh (chỉ khi chạy đủ chậm để nghe ra)
+  const st = state.step;
+  if (audio.enabled && info.playing && player.speed < 90 && st) {
+    if (st.op === 'compare' || st.op === 'swap' || st.op === 'write') {
+      const idx = st.i ?? 0;
+      audio.ping(state.array[idx] ?? 0, current.maxValue, st.op);
+    }
+  }
+}
+
+function opBadge(step) {
+  if (!step) return '';
+  const map = {
+    compare: ['so sánh', 'var(--bar-compare)'],
+    swap: ['đổi chỗ', 'var(--bar-swap)'],
+    write: ['ghi', 'var(--bar-swap)'],
+    sorted: ['chốt', 'var(--bar-sorted)'],
+    pivot: ['chốt phân hoạch', 'var(--bar-pivot)'],
+    range: ['đoạn xử lý', 'var(--accent)'],
+    aux: ['mảng đếm', 'var(--accent)'],
+    note: ['ghi chú', 'var(--muted)'],
+  };
+  const [label, color] = map[step.op] || map.note;
+  return `<b style="color:${color};font:600 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.05em;margin-right:8px">${label}</b>`;
+}
+
+function renderAux(aux) {
+  if (!aux) {
+    if (!el.aux.hidden) { el.aux.hidden = true; auxCells = []; }
+    return;
+  }
+  el.aux.hidden = false;
+  el.aux.querySelector('.aux-label').textContent = aux.label;
+
+  const holder = el.aux.querySelector('.aux-cells');
+  if (auxCells.length !== aux.values.length) {
+    holder.innerHTML = aux.values
+      .map((v, i) => `<div class="aux-cell"><span class="val">${v}</span><span class="idx">${i}</span></div>`).join('');
+    auxCells = [...holder.children];
+  } else {
+    for (let i = 0; i < aux.values.length; i++) {
+      const val = String(aux.values[i]);
+      const valNode = auxCells[i].firstChild;
+      if (valNode.textContent !== val) valNode.textContent = val;
+    }
+  }
+  for (let i = 0; i < auxCells.length; i++) {
+    auxCells[i].classList.toggle('on', i === aux.highlight);
+  }
+}
+
+function updatePlayButton() {
+  const atEnd = player.position >= player.total && player.total > 0;
+  el.play.textContent = player.playing ? '⏸ Dừng' : (atEnd ? '↻ Chạy lại' : '▶ Chạy');
+}
+
+/* ------------------------------------------------------------------ *
+ * Sự kiện
+ * ------------------------------------------------------------------ */
+
+function bind() {
+  el.algo.addEventListener('change', () => regenerate(false));   // giữ nguyên mảng để so sánh công bằng
+  el.dist.addEventListener('change', () => regenerate(true));
+  el.size.addEventListener('input', () => {
+    el.sizeOut.textContent = el.size.value;
+  });
+  el.size.addEventListener('change', () => regenerate(true));
+
+  el.speed.addEventListener('input', () => {
+    const sps = speedFromSlider(Number(el.speed.value));
+    player.setSpeed(sps);
+    el.speedOut.textContent = `${sps < 10 ? sps.toFixed(1) : Math.round(sps)} bước/giây`;
+  });
+
+  el.shuffle.addEventListener('click', () => regenerate(true));
+  el.play.addEventListener('click', () => { player.toggle(); updatePlayButton(); });
+  el.next.addEventListener('click', () => { player.pause(); player.next(); updatePlayButton(); });
+  el.prev.addEventListener('click', () => { player.pause(); player.prev(); updatePlayButton(); });
+  el.toStart.addEventListener('click', () => { player.pause(); player.reset(); updatePlayButton(); });
+  el.toEnd.addEventListener('click', () => { player.pause(); player.end(); updatePlayButton(); });
+
+  el.sound.addEventListener('click', () => {
+    audio.enabled = !audio.enabled;
+    el.sound.textContent = audio.enabled ? '🔊' : '🔇';
+    el.sound.setAttribute('aria-pressed', String(audio.enabled));
+  });
+
+  el.scrub.addEventListener('input', () => {
+    player.pause();
+    player.seek(Number(el.scrub.value));
+    updatePlayButton();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) {
+      if (e.key !== ' ') return;
+    }
+    if (e.key === ' ') { e.preventDefault(); player.toggle(); updatePlayButton(); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); player.pause(); player.next(); updatePlayButton(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); player.pause(); player.prev(); updatePlayButton(); }
+    else if (e.key === 'r' || e.key === 'R') { regenerate(true); }
+  });
+
+  const ro = new ResizeObserver(() => {
+    renderer.resize();
+    renderer.draw(player.state, { maxValue: current.maxValue, tween: 1 });
+  });
+  ro.observe(el.canvas);
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    renderer.resize();
+    renderer.draw(player.state, { maxValue: current.maxValue, tween: 1 });
+  });
+}
+
+/**
+ * Cho phép chia sẻ đúng một tình huống qua URL, ví dụ:
+ *   ?algo=quick&dist=sorted&n=32&step=250
+ * Trả về số bước cần tua tới, hoặc null.
+ */
+function applyUrlParams() {
+  const q = new URLSearchParams(location.search);
+
+  const algo = q.get('algo');
+  if (algo && ALGORITHMS.some((a) => a.id === algo)) el.algo.value = algo;
+
+  const dist = q.get('dist');
+  if (dist && DISTRIBUTIONS.some((d) => d.id === dist)) el.dist.value = dist;
+
+  const n = Number(q.get('n'));
+  if (Number.isFinite(n) && n > 0) {
+    el.size.value = String(Math.max(Number(el.size.min), Math.min(Number(el.size.max), Math.round(n))));
+    el.sizeOut.textContent = el.size.value;
+  }
+
+  const step = Number(q.get('step'));
+  return Number.isFinite(step) && q.has('step') ? step : null;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+/* ------------------------------------------------------------------ *
+ * Chạy
+ * ------------------------------------------------------------------ */
+
+fillSelects();
+buildLegend();
+buildSummary();
+buildFileList();
+bind();
+
+el.sizeOut.textContent = el.size.value;
+el.speed.dispatchEvent(new Event('input'));
+renderer.resize();
+
+const startStep = applyUrlParams();
+regenerate(true);
+if (startStep != null) { player.seek(startStep); updatePlayButton(); }
+
+</script>
+</body>
+</html>
